@@ -132,7 +132,7 @@ class MyPDFTwo {
         $this->_PDF->writeHTMLCell(190, 9, 11,82, $html, 0, 1, 0, true, 'L', true);
         $html = "<p>A类：加班调休、年休假、特别调休</p>";
         $this->_PDF->writeHTMLCell(190, 9, 15,90, $html, 0, 1, 0, true, 'L', true);
-        $html = "<p>B 类：婚假、丧假、护理假、产假、晚育假、哺乳假</p>";
+        $html = "<p>B 类：婚假、丧假、产假、陪护假、等其他假期</p>";
         $this->_PDF->writeHTMLCell(190, 9, 95,90, $html, 0, 1, 0, true, 'L', true);
         $html = "<p>C类：产前假、病假</p>";
         $this->_PDF->writeHTMLCell(190, 9, 15,98, $html, 0, 1, 0, true, 'L', true);
