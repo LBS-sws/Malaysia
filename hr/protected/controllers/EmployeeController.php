@@ -8,6 +8,8 @@
  */
 class EmployeeController extends Controller
 {
+	public $function_id='ZE03';
+
     public function filters()
     {
         return array(

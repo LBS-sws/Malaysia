@@ -235,6 +235,8 @@ class PrizeForm extends CFormModel
 
     protected function sendEmail(){
         if($this->audit){
+            $prizeProList = PrizeList::getPrizeList();
+            $prizeTypeList = array(Yii::t("fete","testimonial"),Yii::t("fete","prize"));
             $email = new Email();
             $this->retrieveData($this->id);
             $description="锦旗申请 - ".$this->employee_name;
@@ -243,6 +245,8 @@ class PrizeForm extends CFormModel
             $message.="<p>员工姓名：".$this->employee_name."</p>";
             $message.="<p>员工城市：".General::getCityName($this->city)."</p>";
             $message.="<p>嘉许日期：".date("Y-m-d",strtotime($this->prize_date))."</p>";
+            $message.="<p>嘉许项目：".$prizeProList[$this->prize_pro]."</p>";
+            $message.="<p>客户奖励：".$prizeTypeList[$this->prize_type]."</p>";
             $message.="<p>锦旗总数：".$this->type_num."</p>";
             $message.="<p>申请时间：".$this->lcd."</p>";
             $email->setDescription($description);

@@ -8,6 +8,7 @@
  */
 class CompanyController extends Controller
 {
+	public $function_id='ZA02';
 
     public function filters()
     {

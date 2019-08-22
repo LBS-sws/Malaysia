@@ -34,6 +34,9 @@ class ReportController extends Controller
 	}
 
 	public function actionSalessummary() {
+		$this->function_id = self::$actions['salessummary'];
+		Yii::app()->session['active_func'] = $this->function_id;
+		
 		$model = new ReportY01Form;
 		if (isset($_POST['ReportY01Form'])) {
 			$model->attributes = $_POST['ReportY01Form'];
@@ -49,6 +52,9 @@ class ReportController extends Controller
 	}
 
     public function actionOvertimelist() {
+		$this->function_id = self::$actions['overtimelist'];
+		Yii::app()->session['active_func'] = $this->function_id;
+		
         $model = new ReportY02Form;
         if (isset($_POST['ReportY02Form'])) {
             $model->attributes = $_POST['ReportY02Form'];
@@ -64,6 +70,9 @@ class ReportController extends Controller
     }
 
     public function actionLeavelist() {
+		$this->function_id = self::$actions['leavelist'];
+		Yii::app()->session['active_func'] = $this->function_id;
+		
         $model = new ReportY03Form;
         if (isset($_POST['ReportY03Form'])) {
             $model->attributes = $_POST['ReportY03Form'];
@@ -79,6 +88,9 @@ class ReportController extends Controller
     }
 
     public function actionPennantexlist() {
+		$this->function_id = self::$actions['pennantexlist'];
+		Yii::app()->session['active_func'] = $this->function_id;
+		
         $model = new ReportY05Form;
         if (isset($_POST['ReportY05Form'])) {
             $model->attributes = $_POST['ReportY05Form'];
@@ -94,6 +106,9 @@ class ReportController extends Controller
     }
 
     public function actionPennantculist() {
+		$this->function_id = self::$actions['pennantculist'];
+		Yii::app()->session['active_func'] = $this->function_id;
+		
         $model = new ReportY05Form;
         $model->id = 'RptPennantCuList';
         $model->name = Yii::t('app','Pennants cumulative List');

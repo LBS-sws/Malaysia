@@ -88,6 +88,17 @@ $this->pageTitle=Yii::app()->name . ' - Work Form';
                 'model'=>$model,
             ));
             ?>
+            <?php if ($model->scenario != 'new' && $model->status != 3 && $model->status != 4): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'state',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-6">
+                        <?php echo $form->textField($model, 'state',
+                            array('readonly'=>(true),"rows"=>4)
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <?php if ($model->status != 0 && $model->status != 3 && Yii::app()->user->validFunction('ZR07') && $model->scenario!='new'): ?>
                 <legend>&nbsp;</legend>
                 <?php if ($model->work_cost == "0.00"): ?>

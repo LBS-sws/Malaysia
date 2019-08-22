@@ -8,6 +8,7 @@
  */
 class PrizeController extends Controller
 {
+	public $function_id='ZE08';
 
     public function filters()
     {

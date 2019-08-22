@@ -32,6 +32,8 @@ class LeaveForm extends CFormModel
     public $wage;//合約工資
     public $staff_type;//員工的辦公類型
 
+    public $state;//員工的辦公類型
+
 
 
     public $no_of_attm = array(
@@ -70,6 +72,7 @@ class LeaveForm extends CFormModel
             'reject_cause'=>Yii::t('contract','Rejected Remark'),
             'wage'=>Yii::t('contract','Contract Pay'),
             'lcd'=>Yii::t('fete','apply for time'),
+            'state'=>Yii::t('contract','Status'),
 		);
 	}
 
@@ -110,6 +113,23 @@ class LeaveForm extends CFormModel
             }
         }
     }
+    //獲取年假的最大日期
+    public function getMaxYearLeaveDate($employee_id,$time){
+        $entry_time = date("Y/m/d",strtotime(date("Y/m/d")."+2 year"));
+        $sql = "SELECT entry_time FROM hr_employee WHERE staff_status = 0 AND id=$employee_id";
+        $row = Yii::app()->db->createCommand($sql)->queryRow();
+        if($row){
+            $year = empty($time)?date("Y"):date("Y",strtotime($time));
+            $thisMonth = empty($time)?date("/m/d"):date("/m/d",strtotime($time));
+            $month = date("/m/d",strtotime($row["entry_time"]." - 1 day"));
+            if($thisMonth>$month){
+                $year++;
+            }
+            $entry_time = $year.$month;
+        }
+        return $entry_time;
+    }
+
 	//驗證請假類型
     public function validateLeaveType($attribute, $params){
 	    $id = $this->vacation_id;
@@ -120,9 +140,14 @@ class LeaveForm extends CFormModel
             if($rows["vaca_type"] == "E"){ //年假
                 $yearDay =YearDayForm::getSumDayToYear($this->employee_id,$this->start_time);
                 $leaveNum =LeaveForm::getLeaveNumToYear($this->employee_id,$this->start_time);
+                $maxDate = LeaveForm::getMaxYearLeaveDate($this->employee_id,$this->start_time);
                 $leaveNum =$yearDay - floatval($leaveNum);
                 if(floatval($this->log_time) > $leaveNum){
                     $message = Yii::t('fete','Log Date')."不能大于".$leaveNum."天";
+                    $this->addError($attribute,$message);
+                }
+                if(date("Y-m-d",strtotime($this->end_time))>date("Y-m-d",strtotime($maxDate))){
+                    $message = Yii::t('contract','End Time')."不能大于".$maxDate;
                     $this->addError($attribute,$message);
                 }
             }
@@ -204,7 +229,7 @@ class LeaveForm extends CFormModel
             $records["posi_name"]=DeptForm::getDeptToId($records["position"]);
             if($records["vaca_type"] == "E"){ //年假
                 $records["sumDay"] =YearDayForm::getSumDayToYear($records["employee_id"],$records["start_time"]);
-                $records["leaveNum"] =LeaveForm::getLeaveNumToYear($records["employee_id"],$records["start_time"],true);
+                $records["leaveNum"] =LeaveForm::getLeaveNumToYear($records["employee_id"],$records["start_time"],true,$records['lcd']);
             }else{
                 $records["sumDay"]=0;
                 $records["leaveNum"]=0;
@@ -248,7 +273,7 @@ class LeaveForm extends CFormModel
     }
 
     //某年累積的請假天數（僅年假)
-    public function getLeaveNumToYear($employee_id,$time="",$endBool=false){
+    public function getLeaveNumToYear($employee_id,$time="",$endBool=false,$lcd=''){
         if(empty($employee_id)){
             return 0;
         }
@@ -263,21 +288,22 @@ class LeaveForm extends CFormModel
         $year = date("Y",strtotime($time));
         $month = date("m",strtotime($rows["entry_time"]));
         $day = date("d",strtotime($rows["entry_time"]));
-        if(date("m-d",strtotime($time))>date("m-d",strtotime($rows["entry_time"]))){
+        if(date("m-d",strtotime($time))>=date("m-d",strtotime($rows["entry_time"]))){
             $start_time = "$year-$month-$day 00:00:00";
-            $end_time = (intval($year)+1)."-$month-$day 23:59:59";
+            $end_time = (intval($year)+1)."-$month-$day 00:00:00";
         }else{
             $start_time = (intval($year)-1)."-$month-$day 00:00:00";
-            $end_time = "$year-$month-$day 23:59:59";
+            $end_time = "$year-$month-$day 00:00:00";
         }
         $statusSql = "a.status NOT IN (0,3)";
         if($endBool){
-            $end_time = date("Y-m-d 23:59:59",strtotime($time));
-            $statusSql = "a.status =  4";
+            //$end_time = date("Y-m-d 23:59:59",strtotime($time));
+            $statusSql = "a.status =  4 and a.lcd<='$lcd'";
         }
         $sql = "select sum(a.log_time) AS sumDay from hr_employee_leave a 
             LEFT JOIN hr_vacation b ON a.vacation_id = b.id
             WHERE a.start_time>'$start_time'AND a.start_time<='$end_time' AND $statusSql AND b.vaca_type='E' AND a.employee_id=$employee_id";
+        //var_dump($sql);die();
         $Sum = Yii::app()->db->createCommand($sql)->queryRow();
         if($Sum){
             return $Sum["sumDay"];
@@ -309,8 +335,8 @@ class LeaveForm extends CFormModel
                 $this->z_index = $row['z_index'];
                 $this->start_time_lg = $row['start_time_lg'];
                 $this->end_time_lg = $row['end_time_lg'];
+                $this->state = LeaveForm::translationState($row['z_index']);
                 $this->status = $row['status'];
-                $this->user_lcu = $row['user_lcu'];
                 $this->user_lcd = $row['user_lcd'];
                 $this->area_lcu = $row['area_lcu'];
                 $this->area_lcd = $row['area_lcd'];
@@ -329,6 +355,22 @@ class LeaveForm extends CFormModel
 		}
 		return true;
 	}
+
+//1:部門審核、2：主管、3：總監、4：你
+	public function translationState($str){
+        switch ($str){
+            case 1:
+                return "部門審核（數據輸入 → 審核）";
+            case 2:
+                return "主管審核（員工 → 審核）";
+            case 3:
+                return "總監審核（審核 → 審核）";
+            case 4:
+                return "最高審核（系統設置 → 審核）";
+            default:
+                return $str;
+        }
+    }
 
     //刪除驗證
     public function deleteValidate(){

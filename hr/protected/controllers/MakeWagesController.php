@@ -8,6 +8,7 @@
  */
 class MakeWagesController extends Controller
 {
+	public $function_id='ZA04';
 
     public function filters()
     {

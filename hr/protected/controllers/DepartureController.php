@@ -8,6 +8,7 @@
  */
 class DepartureController extends Controller
 {
+	public $function_id='ZE02';
 
     public function filters()
     {

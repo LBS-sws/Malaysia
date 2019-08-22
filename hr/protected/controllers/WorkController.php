@@ -9,6 +9,8 @@
 class WorkController extends Controller
 {
 
+	public $function_id='ZA05';
+	
     public function filters()
     {
         return array(

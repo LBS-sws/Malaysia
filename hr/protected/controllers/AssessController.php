@@ -8,6 +8,7 @@
  */
 class AssessController extends Controller
 {
+	public $function_id='ZE07';
 
     public function filters()
     {

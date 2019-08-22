@@ -9,6 +9,8 @@
 class YearDayController extends Controller
 {
 
+	public $function_id='ZC07';
+	
     public function filters()
     {
         return array(

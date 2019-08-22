@@ -9,6 +9,8 @@
 class WordController extends Controller
 {
 
+ 	public $function_id='ZD01';
+	
     public function filters()
     {
         return array(

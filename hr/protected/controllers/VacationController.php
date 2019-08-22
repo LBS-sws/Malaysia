@@ -8,7 +8,8 @@
  */
 class VacationController extends Controller
 {
-
+	public $function_id='ZC04';
+	
     public function filters()
     {
         return array(

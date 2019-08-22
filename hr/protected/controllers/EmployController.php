@@ -8,6 +8,8 @@
  */
 class EmployController extends Controller
 {
+	public $function_id='ZE01';
+
     public function filters()
     {
         return array(
@@ -139,8 +141,7 @@ class EmployController extends Controller
             $uid = Yii::app()->user->id;
             Yii::app()->db->createCommand()->update('hr_employee', array(
                 'jj_card'=>$data['jj_card'],
-                'sb_card'=>$data['sb_card'],
-                'ld_card'=>$data['ld_card'],
+                'social_code'=>$data['social_code'],
                 'staff_status'=>0,
                 'staff_old_status'=>0,
             ), 'id=:id and staff_status=4', array(':id'=>$data['id']));

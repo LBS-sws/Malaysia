@@ -58,6 +58,8 @@ class DeptController extends Controller
     }
 
     public function actionIndex($pageNum=0,$type=0){
+		$this->function_id = $type==0 ? 'ZC01' : 'ZC02';
+		Yii::app()->session['active_func'] = $this->function_id;
         $model = new DeptList;
         $model->type=$type;
         if (isset($_POST['DeptList'])) {
@@ -77,6 +79,8 @@ class DeptController extends Controller
 
     public function actionNew($type=0)
     {
+		$this->function_id = $type==0 ? 'ZC01' : 'ZC02';
+		Yii::app()->session['active_func'] = $this->function_id;
         $model = new DeptForm('new');
         $model->type = $type;
         $this->render('form',array('model'=>$model,));
@@ -88,6 +92,8 @@ class DeptController extends Controller
         if (!$model->retrieveData($index)) {
             throw new CHttpException(404,'The requested page does not exist.');
         } else {
+			$this->function_id = $model->type==0 ? 'ZC01' : 'ZC02';
+			Yii::app()->session['active_func'] = $this->function_id;
             $this->render('form',array('model'=>$model,));
         }
     }
@@ -98,6 +104,8 @@ class DeptController extends Controller
         if (!$model->retrieveData($index)) {
             throw new CHttpException(404,'The requested page does not exist.');
         } else {
+			$this->function_id = $model->type==0 ? 'ZC01' : 'ZC02';
+			Yii::app()->session['active_func'] = $this->function_id;
             $this->render('form',array('model'=>$model,));
         }
     }
@@ -113,6 +121,8 @@ class DeptController extends Controller
                 Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
                 $this->redirect(Yii::app()->createUrl('dept/edit',array('index'=>$model->id,'type'=>$model->type)));
             } else {
+                $this->function_id = $model->type==0 ? 'ZC01' : 'ZC02';
+                Yii::app()->session['active_func'] = $this->function_id;
                 $message = CHtml::errorSummary($model);
                 Dialog::message(Yii::t('dialog','Validation Message'), $message);
                 $this->render('form',array('model'=>$model,));

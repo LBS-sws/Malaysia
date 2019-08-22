@@ -9,6 +9,8 @@
 class AuditController extends Controller
 {
 
+	public $function_id='ZG01';
+
 
     public function filters()
     {

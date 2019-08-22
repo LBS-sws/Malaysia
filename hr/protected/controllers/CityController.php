@@ -8,6 +8,7 @@
  */
 class CityController extends Controller
 {
+	public $function_id='ZC09';
 
     public function filters()
     {

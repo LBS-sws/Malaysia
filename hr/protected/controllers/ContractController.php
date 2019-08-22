@@ -8,6 +8,7 @@
  */
 class ContractController extends Controller
 {
+	public $function_id='ZD02';
 
 
     public function filters()

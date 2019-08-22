@@ -2,7 +2,8 @@
 
 class TestController extends Controller
 {
-
+	public $interactive = false;
+	
     public function actionTest(){
         $command = Yii::app()->db->createCommand();
         $firstday = date("Y/m/d");

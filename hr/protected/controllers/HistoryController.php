@@ -7,6 +7,7 @@
  */
 class HistoryController extends Controller
 {
+	public $function_id='ZE03';
 
     public function filters()
     {

@@ -46,8 +46,8 @@ class DeptForm extends CFormModel
             array('id, name, z_index, dept_id, type, dept_class, manager, technician','safe'),
 			array('name','required'),
 			array('city','validateCity'),
+            array('dept_id','validateDeptId'),
 			array('name','validateName'),
-			array('dept_id','validateDeptId'),
 		);
 	}
 
@@ -64,12 +64,12 @@ class DeptForm extends CFormModel
 
 	public function validateDeptId($attribute, $params){
 	    if($this->type == 1){
-	        if(!is_numeric($this->dept_id)){
+	        if(empty($this->dept_id)||!is_numeric($this->dept_id)){
                 $message = Yii::t('contract','in department'). Yii::t('contract',' can not be empty');
                 $this->addError($attribute,$message);
             }else{
                 $rows = Yii::app()->db->createCommand()->select()->from("hr_dept")
-                    ->where('id!=:id and type=0 ', array(':id'=>$this->dept_id))->queryRow();
+                    ->where('id=:id and type=0 ', array(':id'=>$this->dept_id))->queryRow();
                 if (!$rows){
                     $message = Yii::t('contract','in department'). Yii::t('contract',' can not be empty');
                     $this->addError($attribute,$message);
@@ -102,7 +102,7 @@ class DeptForm extends CFormModel
         }
     }
     public function setCityToDept(){
-        if ($this->type == 1){
+        if ($this->type == 1&&!empty($this->dept_id)){
             $rows = Yii::app()->db->createCommand()->select()->from("hr_dept")
                 ->where('id=:id', array(':id'=>$this->dept_id))->queryRow();
             if($rows){

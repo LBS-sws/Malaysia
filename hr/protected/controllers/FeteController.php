@@ -8,6 +8,8 @@
  */
 class FeteController extends Controller
 {
+	public $function_id='ZC03';
+
     public function filters()
     {
         return array(

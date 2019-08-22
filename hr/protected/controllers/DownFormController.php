@@ -9,6 +9,8 @@
 class DownFormController extends Controller
 {
 
+	public $function_id='ZD04';
+
     public function filters()
     {
         return array(

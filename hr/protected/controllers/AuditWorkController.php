@@ -80,6 +80,8 @@ class AuditWorkController extends Controller
     }
 
     public function actionIndex($pageNum=0,$only = 1){
+		$this->function_id = self::$assList[$only];
+		Yii::app()->session['active_func'] = $this->function_id;
         $model = new AuditWorkList;
         $model->only = $only;
         if (isset($_POST['AuditWorkList'])) {
@@ -98,7 +100,9 @@ class AuditWorkController extends Controller
 
     public function actionEdit($index,$only = 1)
     {
-        $model = new AuditWorkForm('edit');
+ 		$this->function_id = self::$assList[$only];
+		Yii::app()->session['active_func'] = $this->function_id;
+       $model = new AuditWorkForm('edit');
         if(!in_array($only,array(1,2,3,4))){
             $only = 1;
         }
@@ -112,6 +116,8 @@ class AuditWorkController extends Controller
 
     public function actionView($index,$only = 1)
     {
+		$this->function_id = self::$assList[$only];
+		Yii::app()->session['active_func'] = $this->function_id;
         $model = new AuditWorkForm('view');
         if(!in_array($only,array(1,2,3,4))){
             $only = 1;

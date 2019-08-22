@@ -3,6 +3,7 @@
 return array(
 	'Data Entry'=>array(
 		'access'=>'ZA',
+		'icon'=>'fa-pencil-square-o',
 		'items'=>array(
             'Company Info'=>array(
                 'access'=>'ZA02',
@@ -42,6 +43,7 @@ return array(
     //合同模塊
 	'Contract'=>array(
 		'access'=>'ZD',
+		'icon'=>'fa-file-pdf-o',
 		'items'=>array(
 			'Supplemental Agreement'=>array(
 				'access'=>'ZD03',
@@ -64,6 +66,7 @@ return array(
     //員工模塊
 	'Employee'=>array(
 		'access'=>'ZE',
+		'icon'=>'fa-smile-o',
 		'items'=>array(
             //員工錄入
             'Employee Info'=>array(
@@ -106,6 +109,7 @@ return array(
     //審核模塊
 	'Audit'=>array(
 		'access'=>'ZG',
+		'icon'=>'fa-legal',
 		'items'=>array(
             //入職審核
             'Employee Audit'=>array(
@@ -143,6 +147,7 @@ return array(
 	),
 	'System Setting'=>array(
 		'access'=>'ZC',
+		'icon'=>'fa-gear',
 		'items'=>array(
 			'Department'=>array(
 				'access'=>'ZC01',
@@ -193,6 +198,7 @@ return array(
 	),
 	'Report'=>array(
 		'access'=>'YB',
+		'icon'=>'fa-file-text-o',
 		'items'=>array(
 			'Staff List'=>array(
 				'access'=>'YB04',

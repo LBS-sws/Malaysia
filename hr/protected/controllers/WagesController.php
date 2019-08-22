@@ -9,6 +9,8 @@
 class WagesController extends Controller
 {
 
+	public $function_id='ZA03';
+	
     public function filters()
     {
         return array(

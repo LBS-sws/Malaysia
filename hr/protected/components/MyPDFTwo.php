@@ -269,7 +269,7 @@ class MyPDFTwo {
         $this->_PDF->writeHTMLCell(40, 20, 10,55, $html, 0, 1, false, true, 'C', true);
         $html = "<p>□工作日：（年/月/日/时/分～年/月/日/时/分）</p>";
         $this->_PDF->writeHTMLCell(150, 8, 51,41, $html, 0, 1, false, true, 'L', true);
-        $html = "<p>□周末休息日：（年/月/日/时/分～年/月/日/时/分）</p>";
+        $html = "<p>□周末休息日/工作日：（年/月/日/时/分～年/月/日/时/分）</p>";
         $this->_PDF->writeHTMLCell(150, 8, 51,57, $html, 0, 1, false, true, 'L', true);
         $html = "<p>□法定休假日：（年/月/日/时/分～年/月/日/时/分）</p>";
         $this->_PDF->writeHTMLCell(150, 8, 51,81, $html, 0, 1, false, true, 'L', true);

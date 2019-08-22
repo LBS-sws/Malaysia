@@ -31,6 +31,7 @@ class WorkForm extends CFormModel
 	public $audit = false;//是否需要審核
     public $wage;//合約工資
     public $lcd;
+    public $state;
     public $addTime=array();//額外添加的加班時間段
 
 
@@ -73,6 +74,7 @@ class WorkForm extends CFormModel
             'reject_cause'=>Yii::t('contract','Rejected Remark'),
             'wage'=>Yii::t('contract','Contract Pay'),
             'lcd'=>Yii::t('fete','apply for time'),
+            'state'=>Yii::t('contract','Status'),
 		);
 	}
 
@@ -253,6 +255,7 @@ class WorkForm extends CFormModel
                 $this->you_lcd = $row['you_lcd'];
                 $this->audit_remark = $row['audit_remark'];
                 $this->reject_cause = $row['reject_cause'];
+                $this->state = LeaveForm::translationState($row['z_index']);
                 $this->no_of_attm['workem'] = $row['workemdoc'];
                 break;
 			}

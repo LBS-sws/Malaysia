@@ -184,6 +184,7 @@ class HistoryForm extends CFormModel
                 'safe'),
 			array('update_remark','required'),
 			array('code','required'),
+			array('household','required'),
             array('effect_time','required',"on"=>"change"),
 			array('opr_type','required',"on"=>"change"),
 			array('leave_time','required',"on"=>"departure"),

@@ -8,6 +8,7 @@
  */
 class LeaveController extends Controller
 {
+	public $function_id='ZA06';
 
     public function filters()
     {
@@ -28,7 +29,7 @@ class LeaveController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('new','edit','delete','save','audit','fileupload','fileRemove','ajaxYearDay'),
+                'actions'=>array('new','edit','delete','save','audit','fileupload','fileRemove','ajaxYearDay','test'),
                 'expression'=>array('LeaveController','allowReadWrite'),
             ),
             array('allow',
@@ -292,17 +293,33 @@ class LeaveController extends Controller
             $leave_type = $_POST["leave_type"];
             $model = new VacationForm();
             $html = "";
+            $entry_time = date("Y/m/d",strtotime(date("Y/m/d")."+2 year"));
             if($model->retrieveData($leave_type)){
                 if($model->vaca_type == 'E'){
                     $yearDay =YearDayForm::getSumDayToYear($index,$time);
                     $leaveNum =LeaveForm::getLeaveNumToYear($index,$time);
+                    $entry_time =LeaveForm::getMaxYearLeaveDate($index,$time);
                     $leaveNum =$yearDay - floatval($leaveNum);
                     $html = "<p class='form-control-static text-success'>年假剩余天数：".$leaveNum."</p>";
                 }
             }
-            echo CJSON::encode(array("status"=>1,"html"=>$html));
+            echo CJSON::encode(array("status"=>1,"html"=>$html,"entry_time"=>$entry_time));
         }else{
             $this->redirect(Yii::app()->createUrl(''));
         }
+    }
+
+    //计算年假
+    public function actionTest(){
+        //var_dump(11111);
+        //echo CJSON::encode(array("status"=>1,"html"=>0,"entry_time"=>1));
+        if(key_exists("callback",$_GET)){
+            $callback = $_GET['callback'];
+        }else{
+            $callback = "";
+        }
+        echo $callback.'({"code":200,"message":"","value":[{"adId":0,"adPic":"http://biz.img.jie0.cn/pic/1/d35c7d4f-071c-442b-9679-73efbed4fac1.jpg","adType":3,"addIncome":0.00,"advertiser":"丰科兑换","background":"丰科e商务主营品牌百货、家纺、家电、数码、箱包和进口食品。","businessId":0,"click":175,"clickRate":0.5600,"cost":0.00,"coupons":0,"createTime":1558319419000,"effect":1.00,"hotIndex":0,"id":83,"index":0,"industryId":162,"outerPic":"http://biz.img.jie0.cn/pic/1/0187d784-6ac3-4480-8f91-44537407f7fd.jpg","pic":"http://biz.img.jie0.cn/pic/1/dca64fed-5d02-431f-92ab-18974639cfab.png","pictures":"http://biz.img.jie0.cn/pic/1/4dda9469-3d9b-4e1e-824b-7d2f3b331142.png,http://biz.img.jie0.cn/pic/1/e4c53bfb-0875-424d-85c0-f6cc41c5521d.png,http://biz.img.jie0.cn/pic/1/60948246-5641-40f1-9ed6-4b57933aa704.png,http://biz.img.jie0.cn/pic/1/b33b548e-c9c3-4e52-a9e0-7dce1732ee0c.png,http://biz.img.jie0.cn/pic/1/214d554a-beeb-4c79-8413-4d31ebbe5754.png","publishTime":1558319419000,"purpose":"扩大品牌知名度，通过新渠道挖掘更多潜力用户，促成转化。","pushDesc":"<p>辛苦了，母亲<br/>520献礼，陪伴未曾缺席<br/>罗莱空调被，仅169元<br/>按购买的第30单倍数免费送<br/></p>","pushIcon":"http://biz.img.jie0.cn/pic/1/197016f8-a1ec-4816-aabf-ff2c8910e9a1.jpg","pushSubtitle":"520献礼，陪伴未曾缺席","pushTitle":"丰科兑换广告案例","qrUrl":"http://biz.img.jie0.cn/pic/brain/news/qr/d8c698d7-a39a-4ff0-9a3a-50550d0161f9.jpg","readCount":22,"show":30865,"showTag":0,"status":0,"storeId":0,"strategy":"1.推广微信小程序，直接触达用户促进转化；\n2.针对优店宝的数据，面向23-48岁的女性投放。","testPhone":null,"type":1,"url":null},{"adId":0,"adPic":"http://biz.img.jie0.cn/pic/1/a13439cd-6959-494a-a09a-3cfb6da36466.jpg","adType":3,"addIncome":0.00,"advertiser":"迪欧空间杭州大都会店","background":"迪欧空间创立于1995年，是中国最具规模的软体家具生产企业之一，拥有成熟的设计理念和专业的制造团队，致力打造中国布艺沙发第一品牌。","businessId":0,"click":206,"clickRate":0.7800,"cost":0.00,"coupons":0,"createTime":1558318260000,"effect":2.00,"hotIndex":0,"id":82,"index":0,"industryId":281,"outerPic":"http://biz.img.jie0.cn/pic/1/5bd5d5cf-c061-40e4-9b2a-429052d24a05.jpg","pic":"http://biz.img.jie0.cn/pic/1/6bdc7871-27a3-49f7-b914-b0ab4d8badf2.png","pictures":"http://biz.img.jie0.cn/pic/1/2ad18a3e-7e8f-4bea-87f1-4ca3a55bd41c.png,http://biz.img.jie0.cn/pic/1/eb59952f-dbb3-4982-9f67-e9e7629d0994.png,http://biz.img.jie0.cn/pic/1/439354d9-6f76-4637-a3a8-159eb2f08f81.png","publishTime":1558318260000,"purpose":"迪欧空间希望通过精准的定向推广，获得有效的线索信息，推广优惠活动，实现线下引流。","pushDesc":"<p>新房到手别焦急装<br/>错一步毁一房<br/>先领整体家居方案<br/>再砸金蛋领取现金红包<br/></p>","pushIcon":"http://biz.img.jie0.cn/pic/1/636efbac-daf3-468a-bf43-9ce6a09b7b99.jpg","pushSubtitle":"砸金蛋领取现金红包","pushTitle":"迪欧空间广告案例","qrUrl":"http://biz.img.jie0.cn/pic/brain/news/qr/4c0d4013-9868-480f-bd2a-96bd5b358e2c.jpg","readCount":15,"show":26257,"showTag":0,"status":0,"storeId":0,"strategy":"1.针对优店宝数据，在杭州市进行广告投放；\n2.收集线索，2019.5.25到店即可参加活动，领取礼品；\n3.广告页面搭配小程序一同投放，给顾客不同的展现页面。","testPhone":null,"type":1,"url":null}]})';
+        exit;
+        //Yii::app()->end();
     }
 }

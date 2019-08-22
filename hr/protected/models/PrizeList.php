@@ -62,11 +62,11 @@ class PrizeList extends CListPageModel
                     break;
 			}
 		}
-		if (!empty($this->searchTimeStart) && !empty($this->searchTimeStart)) {
+		if (!empty($this->searchTimeStart)) {
 			$svalue = str_replace("'","\'",$this->searchTimeStart);
             $clause .= " and a.lcd >='$svalue 00:00:00' ";
 		}
-		if (!empty($this->searchTimeEnd) && !empty($this->searchTimeEnd)) {
+		if (!empty($this->searchTimeEnd)) {
 			$svalue = str_replace("'","\'",$this->searchTimeEnd);
             $clause .= " and a.lcd <='$svalue 23:59:59' ";
 		}
@@ -113,6 +113,13 @@ class PrizeList extends CListPageModel
 		$session['prize_01'] = $this->getCriteria();
 		return true;
 	}
+
+	public function getCriteria(){
+	    $arr = parent::getCriteria();
+        $arr["searchTimeStart"] = $this->searchTimeStart;
+        $arr["searchTimeEnd"] = $this->searchTimeEnd;
+        return $arr;
+    }
 
 	public function getPrizeList(){
 	    return array(

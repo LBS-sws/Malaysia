@@ -2,6 +2,7 @@
 
 class AuditRewardController extends Controller
 {
+	public $function_id='ZG06';
 
     public function filters()
     {

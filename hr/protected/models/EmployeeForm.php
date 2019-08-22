@@ -166,6 +166,7 @@ class EmployeeForm extends CFormModel
                 'safe'),
 			array('code','required'),
 			array('name','required'),
+			array('household','required'),
             array('staff_id','required'),
 			array('code','validateCode'),
 			array('sex','required'),
@@ -338,6 +339,10 @@ class EmployeeForm extends CFormModel
                 $word->setValue("staffprovtype",Yii::t("contract",$staff["staff"]["household"]));//戶籍類型
                 $word->setValue("staffhealth",Yii::t("staff",$staff["staff"]["health"]));//身体状况
                 $word->setValue("staffworkexp",$staff["staff"]["experience"]);//工作经验
+
+                $word->setValue("staffemail",$staff["staff"]["email"]);
+                $word->setValue("staffemergency",$staff["staff"]["emergency_user"]);
+                $word->setValue("staffemergencytelno",$staff["staff"]["emergency_phone"]);
 
                 $word->setValue("staffname",$staff["staff"]["name"]);
                 $word->setValue("staffcode",$staff["staff"]["code"]);

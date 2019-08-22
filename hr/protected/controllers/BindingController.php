@@ -8,6 +8,7 @@
  */
 class BindingController extends Controller
 {
+	public $function_id='ZC05';
 
     public function filters()
     {

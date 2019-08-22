@@ -168,6 +168,7 @@ class EmployForm extends CFormModel
                 'safe'),
 			array('entry_time','required'),
 			array('name','required'),
+			array('household','required'),
 			array('staff_id','required'),
 			array('sex','required'),
 			array('name','validateName'),
@@ -414,7 +415,7 @@ class EmployForm extends CFormModel
     //員工刪除時必須是草稿
     public function validateDelete(){
         $rows = Yii::app()->db->createCommand()->select()->from("hr_employee")
-            ->where('id=:id and staff_status=1', array(':id'=>$this->id))->queryRow();
+            ->where('id=:id and staff_status in (1,3,4)', array(':id'=>$this->id))->queryRow();
         if ($rows){
             return true;
         }
@@ -654,6 +655,10 @@ class EmployForm extends CFormModel
         //die();
 		$command->execute();
 
+        if ($this->scenario=='delete'){
+            $this->deleteEmployee();
+        }
+
         if ($this->scenario=='new'){
             $this->id = Yii::app()->db->getLastInsertID();
             $this->lenStr();
@@ -720,6 +725,11 @@ class EmployForm extends CFormModel
         }
         $this->attachment = $arr;
         return $arr;
+    }
+
+    //刪除員工記錄表
+    protected function deleteEmployee(){
+        Yii::app()->db->createCommand()->delete('hr_employee_history', 'employee_id=:id',array(":id"=>$this->id));
     }
 
     //工資權限

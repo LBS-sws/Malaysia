@@ -45,7 +45,7 @@ $this->pageTitle=Yii::app()->name . ' - Employ Form';
                     echo TbHtml::button('<span class="fa fa-save"></span> '.Yii::t('misc','Save'), array(
                         'submit'=>Yii::app()->createUrl('employ/save')));
                 }
-                if(($model->city == Yii::app()->user->city() || $model->scenario=='edit')&&$model->staff_status == 1){
+                if(($model->city == Yii::app()->user->city() || $model->scenario=='edit')&&in_array(intval($model->staff_status),array(1,3,4))){
                     echo TbHtml::button('<span class="fa fa-remove"></span> '.Yii::t('misc','Delete'), array(
                             'name'=>'btnDelete','id'=>'btnDelete','data-toggle'=>'modal','data-target'=>'#removedialog',)
                     );
@@ -100,17 +100,9 @@ $this->pageTitle=Yii::app()->name . ' - Employ Form';
             <?php endif; ?>
             <?php if ($model->staff_status == 4): ?>
                 <div class="form-group">
-                    <?php echo $form->labelEx($model,'ld_card',array('class'=>"col-sm-2 control-label")); ?>
+                    <?php echo $form->labelEx($model,'social_code',array('class'=>"col-sm-2 control-label")); ?>
                     <div class="col-sm-5">
-                        <?php echo $form->textField($model, 'ld_card',
-                            array('readonly'=>($model->scenario=='view'))
-                        ); ?>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <?php echo $form->labelEx($model,'sb_card',array('class'=>"col-sm-2 control-label")); ?>
-                    <div class="col-sm-5">
-                        <?php echo $form->textField($model, 'sb_card',
+                        <?php echo $form->textField($model, 'social_code',
                             array('readonly'=>($model->scenario=='view'))
                         ); ?>
                     </div>

@@ -24,6 +24,7 @@ class AuditPrizeForm extends CFormModel
     public $type_num;
     public $reject_remark;
     public $lcd;
+    public $lcu;
 
     public function attributeLabels()
     {
@@ -94,6 +95,7 @@ class AuditPrizeForm extends CFormModel
                 $this->prize_type = $row['prize_type'];
                 $this->status = $row['status'];
                 $this->remark = $row['remark'];
+                $this->lcu = $row['lcu'];
                 $this->lcd = date("Y-m-d",strtotime($row['lcd']));
                 $this->reject_remark = $row['reject_remark'];
                 break;
@@ -156,12 +158,16 @@ class AuditPrizeForm extends CFormModel
 
 
     protected function sendEmail(){
+        $prizeProList = PrizeList::getPrizeList();
+        $prizeTypeList = array(Yii::t("fete","testimonial"),Yii::t("fete","prize"));
         $email = new Email();
         $this->retrieveData($this->id);
         $message="<p>员工编号：".$this->employee_code."</p>";
         $message.="<p>员工姓名：".$this->employee_name."</p>";
         $message.="<p>员工城市：".General::getCityName($this->city)."</p>";
         $message.="<p>嘉许日期：".date("Y-m-d",strtotime($this->prize_date))."</p>";
+        $message.="<p>嘉许项目：".$prizeProList[$this->prize_pro]."</p>";
+        $message.="<p>客户奖励：".$prizeTypeList[$this->prize_type]."</p>";
         $message.="<p>锦旗总数：".$this->type_num."</p>";
         $message.="<p>申请时间：".$this->lcd."</p>";
         if($this->scenario == "audit"){
@@ -175,7 +181,7 @@ class AuditPrizeForm extends CFormModel
         $email->setDescription($description);
         $email->setMessage($message);
         $email->setSubject($subject);
-        $email->addEmailToStaffId($this->employee_id);
+        $email->addEmailToLcu($this->lcu);
         $email->sent();
     }
 

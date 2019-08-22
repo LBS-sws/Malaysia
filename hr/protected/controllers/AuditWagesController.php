@@ -8,6 +8,7 @@
  */
 class AuditWagesController extends Controller
 {
+	public $function_id='ZG03';
 
     public function filters()
     {

@@ -8,6 +8,7 @@
  */
 class AgreementController extends Controller
 {
+	public $function_id='ZD03';
 
     public function filters()
     {

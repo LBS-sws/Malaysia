@@ -9,7 +9,9 @@
 class AuditConfigController extends Controller
 {
 
-    public function filters()
+ 	public $function_id='ZC08';
+
+	public function filters()
     {
         return array(
             'enforceSessionExpiration',

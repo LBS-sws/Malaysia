@@ -2,6 +2,8 @@
 
 class RewardConController extends Controller
 {
+	public $function_id='ZC06';
+	
     public function filters()
     {
         return array(
