@@ -700,7 +700,8 @@ class EmployForm extends CFormModel
 
 	private function lenStr(){
         $code = strval($this->id);
-        $this->code = "4";
+//Percy: Yii::app()->params['employeeCode']用來處理不同地區版本不同字首
+        $this->code = Yii::app()->params['employeeCode'];
         for($i = 0;$i < 5-strlen($code);$i++){
             $this->code.="0";
         }
