@@ -319,5 +319,6 @@ return array(
     'The payroll is completed this month'=>'本月工資單已全部完成',
     'Staff to be produced'=>'待製作工資單的員工數量',
     'Apply Date'=>'錄入日期',
+    'remaining days of annual leave'=>'剩餘年假天數',
 );
 ?>

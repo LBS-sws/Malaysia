@@ -21,6 +21,8 @@ class EmployeeList extends CListPageModel
 			'city'=>Yii::t('contract','City'),
             'city_name'=>Yii::t('contract','City'),
             'entry_time'=>Yii::t('contract','Entry Time'),
+            'year_day'=>Yii::t('contract','Annual leave'),
+            'remain_year_day'=>Yii::t('contract','remaining days of annual leave'),
 		);
 	}
 
@@ -76,9 +78,13 @@ class EmployeeList extends CListPageModel
 		$list = array();
 		$this->attr = array();
 		if (count($records) > 0) {
+            $time = date("Y-m-d");
 			foreach ($records as $k=>$record) {
 			    $arr = $this->returnStaffStatus($record["test_type"],$record["test_start_time"],$record["test_end_time"],$record["staff_status"]);
                 $arr = $this->resetStatus($arr,$record);
+                $yearDay =YearDayForm::getSumDayToYear($record['id'],$time);
+                $leaveNum =LeaveForm::getLeaveNumToYear($record['id'],$time);
+                $leaveNum =$yearDay - floatval($leaveNum);
 				$this->attr[] = array(
 					'id'=>$record['id'],
 					'name'=>$record['name'],
@@ -92,6 +98,8 @@ class EmployeeList extends CListPageModel
 					'style'=>$arr["style"],
                     'city'=>CGeneral::getCityName($record["city"]),
                     'entry_time'=>$record["entry_time"],
+                    'year_day'=>$record["year_day"],
+                    'remain_year_day'=>$leaveNum,
 				);
 			}
 		}

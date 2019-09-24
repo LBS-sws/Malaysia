@@ -10,6 +10,8 @@
     <td><?php echo $this->record['phone']; ?></td>
 	<td><?php echo $this->record['position']; ?></td>
 	<td><?php echo $this->record['entry_time']; ?></td>
+	<td><?php echo $this->record['year_day']; ?></td>
+	<td><?php echo $this->record['remain_year_day']; ?></td>
 	<td><?php echo $this->record['company_id']; ?></td>
 	<td><?php echo $this->record['status']; ?></td>
     <td>
