@@ -288,7 +288,8 @@ class AssessForm extends CFormModel
 
     private function lenStr($id){
         $code = strval($id);
-        $str = "4";
+//Percy: Yii::app()->params['employeeCode']用來處理不同地區版本不同字首
+        $str = Yii::app()->params['employeeCode'];
         for($i = 0;$i < 5-strlen($code);$i++){
             $str.="0";
         }

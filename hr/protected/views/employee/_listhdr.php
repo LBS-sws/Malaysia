@@ -31,6 +31,16 @@
 		?>
 	</th>
 	<th>
+		<?php echo TbHtml::link($this->getLabelName('year_day').$this->drawOrderArrow('year_day'),'#',$this->createOrderLink('employee-list','year_day'))
+			;
+		?>
+	</th>
+	<th>
+		<?php echo TbHtml::link($this->getLabelName('remain_year_day').$this->drawOrderArrow('year_day'),'#',$this->createOrderLink('employee-list','year_day'))
+			;
+		?>
+	</th>
+	<th>
 		<?php echo TbHtml::link($this->getLabelName('company_id').$this->drawOrderArrow('company_id'),'#',$this->createOrderLink('employee-list','company_id'))
 			;
 		?>
