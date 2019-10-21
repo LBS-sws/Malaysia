@@ -159,5 +159,11 @@ return array(
     'you'=>'你',
 
     'Regular overtime'=>'常規加班',
+
+    //2019-10-21
+    'Vacation type list'=>"假期種類列表",
+    'Vacation type form'=>"假期種類表單",
+    'Vacation type code'=>"假期種類編號",
+    'Vacation type name'=>"假期種類名字",
 );
 ?>

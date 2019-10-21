@@ -137,6 +137,16 @@ return array(
     'Pennants cumulative List'=>'锦旗累积报表',
     'All evaluation lists'=>'所有评估列表',
     'Common forms download'=>'常用表格下载',
+
+    'review'=>'考核',
+    'Review Allot'=>'分配考核',
+    'Review Handle'=>'优化人才评核',
+    'Review Search'=>'查询考核',
+    'Review Set'=>'配置考核选项',
+    'Review Template'=>'考核模板',
+    'Search all review'=>'查询所有考核',
+
+    'Vacation Type Config'=>'假期种类配置',
     //沈超添加结束
 );
 ?>

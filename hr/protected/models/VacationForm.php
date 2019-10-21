@@ -105,13 +105,22 @@ class VacationForm extends CFormModel
 
     //根據id獲取請假類型
     public function getVacaTypeLIst(){
-        return array(
+        $arr = array(
             "E"=>Yii::t("fete","annual leave"),
             "A"=>Yii::t("fete","Overtime, special accommodation"),
             "B"=>Yii::t("fete","Wedding leave, funeral leave, nursing leave, maternity leave, late childbirth, breast-feeding leave"),
             "C"=>Yii::t("fete","Prenatal leave, sick leave"),
             "D"=>Yii::t("fete","Private affair leave")
         );
+        $rows = Yii::app()->db->createCommand()->select("vaca_code,vaca_name")
+            ->from("hr_vacation_type")->order("vaca_code asc")->queryAll();
+        if($rows){
+            $arr = array();
+            foreach ($rows as $row){
+                $arr[$row["vaca_code"]] = $row["vaca_name"];
+            }
+        }
+        return $arr;
     }
     //刪除驗證
     public function deleteValidate(){

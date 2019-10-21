@@ -162,6 +162,10 @@ return array(
 				'access'=>'ZC03',
 				'url'=>'/fete/index',
 			),
+			'Vacation Type Config'=>array(
+				'access'=>'ZC12',
+				'url'=>'/vacationType/index',
+			),
 			'Vacation Config'=>array(
 				'access'=>'ZC04',
 				'url'=>'/vacation/index',
