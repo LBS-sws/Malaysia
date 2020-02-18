@@ -225,7 +225,7 @@
     <?php echo $form->labelEx($model,'staff_type',array('class'=>"col-sm-2 control-label")); ?>
     <div class="col-sm-3">
         <?php echo $form->dropDownList($model, 'staff_type',EmployList::getStaffTypeList(),
-            array('readonly'=>(true),"id"=>"staff_type")
+            array('readonly'=>($readonly),"id"=>"staff_type")
         ); ?>
     </div>
     <!--分割-->
@@ -246,6 +246,21 @@
         ?>
     </div>
     -->
+    <?php if (DeptForm::getSalesTypeToId($model->department)==1): ?>
+        <?php echo $form->labelEx($model,'group_type',array('class'=>"col-sm-2 control-label group_type")); ?>
+        <div class="col-sm-3 group_type">
+            <?php echo $form->dropDownList($model, 'group_type',DeptForm::getGroupType(),
+                array('disabled'=>($readonly),'id'=>'group_type')
+            ); ?>
+        </div>
+    <?php else: ?>
+        <?php echo $form->labelEx($model,'group_type',array('class'=>"col-sm-2 control-label group_type","style"=>"display:none")); ?>
+        <div class="col-sm-3 group_type" style="display: none;">
+            <?php echo $form->dropDownList($model, 'group_type',DeptForm::getGroupType(),
+                array('disabled'=>($readonly),'id'=>'group_type')
+            ); ?>
+        </div>
+    <?php endif; ?>
     <!--分割-->
     <?php echo $form->labelEx($model,'code_old',array('class'=>"col-sm-2 control-label")); ?>
     <div class="col-sm-3">
@@ -577,7 +592,6 @@ if (!empty($contractNum)){
             }
         }).trigger("change");
 
-        <?php if (!$readonly): ?>
         //職位-變化
         $("#position,#department,#change_city").on("change",function () {
             var type = $(this).attr("id");
@@ -599,18 +613,31 @@ if (!empty($contractNum)){
                             for(var key in jsonList){
                                 $("#position").append("<option value='"+key+"'>"+jsonList[key]+"</option>");
                             }
+                            if(data.sales_type == 1){
+                                $(".group_type").show();
+                            }else{
+                                $("#group_type").val(0);
+                                $(".group_type").hide();
+                            }
                         }else if(type=="change_city"){
                             $("#department,#position").html("<option value=''></option>");
                             for(var key in jsonList){
                                 $("#department").append("<option value='"+key+"'>"+jsonList[key]+"</option>");
                             }
+                            if(data.sales_type == 1){
+                                $(".group_type").show();
+                            }else{
+                                $("#group_type").val(0);
+                                $(".group_type").hide();
+                            }
                         }else{
-                            $("#staff_type").val(jsonList);
+                            $("#staff_type").val(jsonList['dept_class']);
                         }
                     }
                 }
             });
         });
-        <?php endif; ?>
+
+        //$("#position").trigger("change");
     })
 </script>
