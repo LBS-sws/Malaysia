@@ -52,20 +52,30 @@ $this->pageTitle=Yii::app()->name . ' - Report';
             <?php endif ?>
 
             <div class="form-group">
-                <?php echo $form->labelEx($model,'year',array('class'=>"col-sm-2 control-label")); ?>
+                <?php echo $form->labelEx($model,'start_dt',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-3">
-                    <?php echo $form->dropDownList($model, 'year',ReportY05Form::getYearList(),
-                        array('disabled'=>($model->scenario=='view'))
-                    ); ?>
+                    <div class="input-group date">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <?php echo $form->textField($model, 'start_dt',
+                            array('class'=>'form-control pull-right','readonly'=>($model->scenario=='view'),));
+                        ?>
+                    </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <?php echo $form->labelEx($model,'month',array('class'=>"col-sm-2 control-label")); ?>
+                <?php echo $form->labelEx($model,'end_dt',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-3">
-                    <?php echo $form->dropDownList($model, 'month',ReportY05Form::getMonthList(),
-                        array('disabled'=>($model->scenario=='view'))
-                    ); ?>
+                    <div class="input-group date">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <?php echo $form->textField($model, 'end_dt',
+                            array('class'=>'form-control pull-right','readonly'=>($model->scenario=='view'),));
+                        ?>
+                    </div>
                 </div>
             </div>
 
@@ -104,6 +114,12 @@ Yii::app()->clientScript->registerScript('lookupStaffs',$js,CClientScript::POS_R
 
 $js = Script::genLookupSelect();
 Yii::app()->clientScript->registerScript('lookupSelect',$js,CClientScript::POS_READY);
+
+$js = Script::genDatePicker(array(
+    'ReportY05Form_start_dt',
+    'ReportY05Form_end_dt',
+));
+Yii::app()->clientScript->registerScript('datePick',$js,CClientScript::POS_READY);
 
 ?>
 

@@ -259,13 +259,17 @@ class EmployController extends Controller
                 $data = $model->getPosiList($department);
                 unset($data[""]);
                 $json["data"] = $data;
+                $json["sales_type"] = $model->getSalesTypeToId($department);
             }elseif($type=="change_city"){
                 $data = $model->getDeptListToCity("",$change_city);
                 unset($data[""]);
                 $json["data"] = $data;
+                reset($data);
+                $department = key($data);
+                $json["sales_type"] = $model->getSalesTypeToId($department);
             }else{
                 $model->retrieveData($position);
-                $json["data"] = $model->dept_class;
+                $json["data"]['dept_class'] = $model->dept_class;
             }
             echo CJSON::encode($json);
         }else{

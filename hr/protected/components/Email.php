@@ -60,6 +60,20 @@ class Email {
         }
     }
 
+    //獲取重要地區總監的郵件
+    public function getJoeEmailAndMore(){
+        $suffix = Yii::app()->params['envSuffix'];
+        $rs = Yii::app()->db->createCommand()->select("b.email")->from("security$suffix.sec_city a")
+            ->leftJoin("security$suffix.sec_user b","a.incharge=b.username")
+            ->where("a.code in ('CN','HD','HN','HXHB')")
+            ->queryAll();
+        if($rs){
+            return array_column($rs,'email');
+        }else{
+            return array("joeyiu@lbsgroup.com.cn");
+        }
+    }
+
     //添加收信人(根據權限）
     public function addEmailToPrefix($str){
         $suffix = Yii::app()->params['envSuffix'];
@@ -75,6 +89,26 @@ class Email {
         $rs = Yii::app()->db->createCommand()->select("b.email, b.username")->from("security$suffix.sec_user_access a")
             ->leftJoin("security$suffix.sec_user b","a.username=b.username")
             ->where("a.system_id='$systemId' and a.a_read_write like '%$str%' $sql and b.email != '' and b.status='A'")
+            ->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                if(!in_array($row["email"],$this->to_addr)){
+                    $this->to_addr[] = $row["email"];
+                }
+                if(!in_array($row["username"],$this->to_user)){	//因通知記錄需要
+                    $this->to_user[] = $row["username"];
+                }
+            }
+        }
+    }
+
+    //添加收信人(根據權限-不包括城市）
+    public function addEmailToPrefixNullCity($str){
+        $suffix = Yii::app()->params['envSuffix'];
+        $systemId = Yii::app()->params['systemId'];
+        $rs = Yii::app()->db->createCommand()->select("b.email, b.username")->from("security$suffix.sec_user_access a")
+            ->leftJoin("security$suffix.sec_user b","a.username=b.username")
+            ->where("a.system_id='$systemId' and a.a_read_write like '%$str%' and b.email != '' and b.status='A'")
             ->queryAll();
         if($rs){
             foreach ($rs as $row){
@@ -107,17 +141,38 @@ class Email {
         }
     }
 
+    //添加收信人(所有地區老總）
+    public function addEmailToAllCity(){
+        $suffix = Yii::app()->params['envSuffix'];
+        $rows = Yii::app()->db->createCommand()->select("b.email, b.username")->from("security$suffix.sec_city a")
+            ->leftJoin("security$suffix.sec_user b","a.incharge=b.username")
+            ->where("b.email != '' and b.status='A'")
+            ->queryAll();
+        if($rows){
+            foreach ($rows as $rs){
+                if(!empty($rs["email"])){
+                    if(!in_array($rs["email"],$this->to_addr)){
+                        $this->to_addr[] = $rs["email"];
+                    }
+                    if(!in_array($rs["username"],$this->to_user)){	//因通知記錄需要
+                        $this->to_user[] = $rs["username"];
+                    }
+                }
+            }
+        }
+    }
+
     //
     public function getEmailUserList($city_allow){
         if(!empty($city_allow)){
-            $city_allow = implode(",",$city_allow);
-            $sql = "a.city in ($city_allow)";
+            $city_allow = implode("','",$city_allow);
+            $sql = "a.city in ('CN','$city_allow')";
         }else{
             return false;
         }
         $suffix = Yii::app()->params['envSuffix'];
         $systemId = Yii::app()->params['systemId'];
-        $rs = Yii::app()->db->createCommand()->select("a.username,a.city,a.email,(CASE WHEN b.incharge = a.username THEN 1 ELSE 0 END) AS incharge,c.a_read_write")
+        $rs = Yii::app()->db->createCommand()->select("a.username,a.city,a.email,(CASE WHEN a.username IN (SELECT incharge FROM security$suffix.sec_city) THEN 1 ELSE 0 END) AS incharge,c.a_read_write")
             ->from("security$suffix.sec_user a")
             ->leftJoin("security$suffix.sec_city b","a.city = b.code")
             ->leftJoin("security$suffix.sec_user_access c","a.username = c.username")
@@ -214,11 +269,14 @@ class Email {
     }
 
     //添加收信人(根據權限和部門）
-    public function addEmailToPrefixAndPoi($str,$department){
+    public function addEmailToPrefixAndPoi($str,$department,$groupType=0){
         $suffix = Yii::app()->params['envSuffix'];
         $systemId = Yii::app()->params['systemId'];
         //$city = Yii::app()->user->city();
         $sql = " and d.department = '$department' ";
+        if(!empty($groupType)){
+            $sql.=" and d.group_type in (0,$groupType) ";
+        }
         if(!is_array($str)){
             $likeSql = " and a.a_read_write like '%$str%'";
         }else{
@@ -233,6 +291,7 @@ class Email {
         }
         $rs = Yii::app()->db->createCommand()->select("b.email, b.username")->from("hr_binding e")
             ->leftJoin("hr_employee d","d.id = e.employee_id")
+            ->leftJoin("hr_dept f","f.id = d.position")
             ->leftJoin("security$suffix.sec_user_access a","a.username = e.user_id")
             ->leftJoin("security$suffix.sec_user b","a.username=b.username")
             ->where("a.system_id='$systemId' $likeSql $sql and b.email != '' and b.status='A'")
@@ -283,7 +342,8 @@ class Email {
     }
 
     //發送郵件
-    public function sent($uid=""){
+    public function sent($uid="",$systemId="",$request_dt=""){
+        $request_dt = empty($request_dt)?date('Y-m-d H:i:s'):$request_dt;
         if(empty($this->to_addr)){ //後期修改，如果沒有收件人不發送郵件
             return false;
         }
@@ -291,10 +351,13 @@ class Email {
         if(empty($uid)){
             $uid = Yii::app()->user->id;
         }
+        if(empty($systemId)){
+            $systemId = Yii::app()->user->system();
+        }
         $from_addr = Yii::app()->params['adminEmail'];
         $suffix = Yii::app()->params['envSuffix'];
         $aaa = Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
-            'request_dt'=>date('Y-m-d H:i:s'),
+            'request_dt'=>$request_dt,
             'from_addr'=>$from_addr,
             'to_addr'=>$to_addr,
             'subject'=>$this->subject,//郵件主題
@@ -313,7 +376,7 @@ class Email {
 				'description'=>$this->description,//郵件副題
 				'message'=>$this->message,
 				'username'=>json_encode($this->to_user),
-				'system_id'=>Yii::app()->user->system(),
+				'system_id'=>$systemId,
 				'form_id'=>$this->form_id,
 				'rec_id'=>$this->rec_id,
 			)

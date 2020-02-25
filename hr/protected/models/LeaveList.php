@@ -72,8 +72,14 @@ class LeaveList extends CListPageModel
             $sql1.=" and ((b.city in($city_allow) and a.status !=0) or a.employee_id='$employee_id' or a.lcu='$lcuId') ";
             $sql2.=" and ((b.city in($city_allow) and a.status !=0) or a.employee_id='$employee_id' or a.lcu='$lcuId') ";
         }elseif($manager["manager"] == 1){
-            $sql1.=" and ((b.department='".$manager["department"]."' and a.status !=0) or a.employee_id='$employee_id' or a.lcu='$lcuId') ";
-            $sql2.=" and ((b.department='".$manager["department"]."' and a.status !=0) or a.employee_id='$employee_id' or a.lcu='$lcuId') ";
+            $sql1.=" and ((b.department='".$manager["department"]."' ";
+            $sql2.=" and ((b.department='".$manager["department"]."' ";
+            if(!empty($manager["group_type"])){
+                $sql1.=" and b.group_type='".$manager["group_type"]."' ";
+                $sql2.=" and b.group_type='".$manager["group_type"]."' ";
+            }
+            $sql1.=" and a.status !=0) or a.employee_id='$employee_id') ";
+            $sql2.=" and a.status !=0) or a.employee_id='$employee_id') ";
         }else{
             $sql1.=" and (a.employee_id='$employee_id' or a.lcu='$lcuId') ";
             $sql2.=" and (a.employee_id='$employee_id' or a.lcu='$lcuId') ";

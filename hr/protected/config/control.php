@@ -9,4 +9,9 @@ return array(
 	'Generation ask for leave'=>array('access'=>'ZR06',),//代請假
 	'salary deduction is shown'=>array('access'=>'ZR07',),//工資扣減顯示
 	'All evaluation lists'=>array('access'=>'ZR08',),//所有評估列表
+	'Search all review'=>array('access'=>'ZR09',),//查询所有考核
+	'Daily incoming and outgoing email'=>array('access'=>'ZR10',),//入职、离职总览电邮
+	'Search all support'=>array('access'=>'ZR11',),//查询所有支援
+	'Back to review'=>array('access'=>'ZR12',),//退回单个考核
+	'Back to leave and work'=>array('access'=>'ZR13',),//退回請假單及加班單
 );

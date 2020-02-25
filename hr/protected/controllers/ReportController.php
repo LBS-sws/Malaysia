@@ -6,6 +6,7 @@ class ReportController extends Controller
         'overtimelist'=>'YB02',
         'pennantexlist'=>'YB05',
         'pennantculist'=>'YB06',
+        'reviewlist'=>'YB07',
         'leavelist'=>'YB03',
     );
 	
@@ -92,6 +93,9 @@ class ReportController extends Controller
 		Yii::app()->session['active_func'] = $this->function_id;
 		
         $model = new ReportY05Form;
+        $model->start_dt = date("Y/m/d");
+        $model->end_dt = date("Y/m/d",strtotime("+1 month"));
+        $model->fields = 'start_dt,end_dt,staffs,staffs_desc';
         if (isset($_POST['ReportY05Form'])) {
             $model->attributes = $_POST['ReportY05Form'];
             if ($model->validate()) {
@@ -123,6 +127,24 @@ class ReportController extends Controller
             }
         }
         $this->render('form_y06',array('model'=>$model));
+    }
+
+    public function actionReviewlist() {
+		$this->function_id = self::$actions['reviewlist'];
+		Yii::app()->session['active_func'] = $this->function_id;
+
+        $model = new ReportY06Form;
+        if (isset($_POST['ReportY06Form'])) {
+            $model->attributes = $_POST['ReportY06Form'];
+            if ($model->validate()) {
+                $model->addQueueItem();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Report submitted. Please go to Report Manager to retrieve the output.'));
+            } else {
+                $message = CHtml::errorSummary($model);
+                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+            }
+        }
+        $this->render('form_y07',array('model'=>$model));
     }
 
 	public static function allowExecute() {

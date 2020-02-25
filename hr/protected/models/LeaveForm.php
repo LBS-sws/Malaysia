@@ -132,16 +132,14 @@ class LeaveForm extends CFormModel
 
 	//驗證請假類型
     public function validateLeaveType($attribute, $params){
-	    $id = $this->vacation_id;
-        $rows = Yii::app()->db->createCommand()->select("*")
-            ->from("hr_vacation")->where("id='$id'")->queryRow();
-        if($rows){
-            $this->vacation_list = $rows;
-            if($rows["vaca_type"] == "E"){ //年假
-                $yearDay =YearDayForm::getSumDayToYear($this->employee_id,$this->start_time);
-                $leaveNum =LeaveForm::getLeaveNumToYear($this->employee_id,$this->start_time);
-                $maxDate = LeaveForm::getMaxYearLeaveDate($this->employee_id,$this->start_time);
-                $leaveNum =$yearDay - floatval($leaveNum);
+        $model = new VacationDayForm($this->employee_id,$this->vacation_id,$this->start_time);
+        $leaveNum = $model->getVacationSum();
+        if ($model->getErrorBool()){
+            $message = Yii::t('fete','Leave Type').Yii::t('contract',' not exist');
+            $this->addError($attribute,$message);
+        }else{
+            $maxDate = $model->getEndTime();
+            if($model->remain_bool){
                 if(floatval($this->log_time) > $leaveNum){
                     $message = Yii::t('fete','Log Date')."不能大于".$leaveNum."天";
                     $this->addError($attribute,$message);
@@ -151,15 +149,6 @@ class LeaveForm extends CFormModel
                     $this->addError($attribute,$message);
                 }
             }
-            if($rows["log_bool"]  == 1){
-                if(floatval($this->log_time) > floatval($rows["max_log"])){
-                    $message = Yii::t('fete','Log Date')."不能大于".$rows["max_log"]."天";
-                    $this->addError($attribute,$message);
-                }
-            }
-        }else{
-            $message = Yii::t('fete','Leave Type').Yii::t('contract',' not exist');
-            $this->addError($attribute,$message);
         }
     }
 	//驗證時間週期
@@ -227,16 +216,30 @@ class LeaveForm extends CFormModel
         if($records){
             $records["dept_name"]=DeptForm::getDeptToId($records["department"]);
             $records["posi_name"]=DeptForm::getDeptToId($records["position"]);
-            if($records["vaca_type"] == "E"){ //年假
-                $records["sumDay"] =YearDayForm::getSumDayToYear($records["employee_id"],$records["start_time"]);
-                $records["leaveNum"] =LeaveForm::getLeaveNumToYear($records["employee_id"],$records["start_time"],true,$records['lcd']);
-            }else{
-                $records["sumDay"]=0;
-                $records["leaveNum"]=0;
-            }
+            $model = new VacationDayForm($records["employee_id"],$records["vacation_id"],$records["start_time"]);
+            $model->getVacationSum($records['lcd']);
+            $records["sumDay"]=$model->getSumDay();
+            $records["leaveNum"]=$model->getUseDay();
+            $this->resetLeaveType($records);
             return $records;
         }else{
             return false;
+        }
+    }
+
+    private function resetLeaveType(&$records){
+        $arr = array(
+            "A"=>array("A","F"),//A类：加班调休、年休假、特别调休
+            "B"=>array("B","G","H","I","J","K"),//B 类：婚假、丧假、护理假、产假、晚育假、哺乳假
+            "C"=>array("C","L"),//C类：产前假、病假
+            "D"=>array("D"),//D类：事假
+            "E"=>array("E")//年假
+        );
+        foreach ($arr as $key => $list){
+            if(in_array($records["vaca_type"],$list)){
+                $records["vaca_type"] = $key;
+                break;
+            }
         }
     }
 
@@ -561,7 +564,7 @@ class LeaveForm extends CFormModel
             $assType = $assList[$this->z_index];
             switch ($this->z_index){
                 case 1:
-                    $email->addEmailToPrefixAndPoi($assType,$row["department"]);
+                    $email->addEmailToPrefixAndPoi($assType,$row["department"],$row["group_type"]);
                     break;
                 case 2:
                     $email->addEmailToPrefixAndOnlyCity($assType,$row["city"]);

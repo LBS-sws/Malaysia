@@ -7,5 +7,7 @@
 
     <td><?php echo $this->record['name']; ?></td>
     <td><?php echo $this->record['city']; ?></td>
+    <td><?php echo $this->record['ass_bool']; ?></td>
+    <td><?php echo $this->record['ass_id_name']; ?></td>
     <td><?php echo $this->record['only']; ?></td>
 </tr>

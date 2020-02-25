@@ -41,6 +41,10 @@ class LeaveController extends Controller
                 'expression'=>array('LeaveController','allowWrite'),
             ),
             array('allow',
+                'actions'=>array('back'),
+                'expression'=>array('LeaveController','allowBack'),
+            ),
+            array('allow',
                 'actions'=>array('cancel'),
                 'expression'=>array('LeaveController','allowCancelled'),
             ),
@@ -48,6 +52,10 @@ class LeaveController extends Controller
                 'users'=>array('*'),
             ),
         );
+    }
+
+    public static function allowBack() {
+        return Yii::app()->user->validFunction('ZR13');
     }
 
     public static function allowReadWrite() {
@@ -189,6 +197,25 @@ class LeaveController extends Controller
         }
     }
 
+    //退回
+    public function actionBack($index){
+        $model = new LeaveForm();
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            if($model->status == 1){
+                Yii::app()->db->createCommand()->update('hr_employee_leave', array(
+                    'status'=>0
+                ), 'id=:id', array(':id'=>$model->id));
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('contract','finish to send back'));
+                $this->redirect(Yii::app()->createUrl('leave/edit',array('index'=>$model->id)));
+            }else{
+                Dialog::message(Yii::t('dialog','Information'), "请假单异常，请刷新重试");
+                $this->redirect(Yii::app()->createUrl('leave/edit',array('index'=>$model->id)));
+            }
+        }
+    }
+
 
     //時間運算
     public function actionAddDate(){
@@ -281,7 +308,7 @@ class LeaveController extends Controller
         } else {
             $pdf = new MyPDFTwo();
             $pdf->setPageToLeave($arr);
-            $pdf->getOutput($arr["employee_name"]."".$arr["leave_code"]);
+            $pdf->getOutput($arr["leave_code"]);
         }
     }
 
@@ -291,17 +318,14 @@ class LeaveController extends Controller
             $index = $_POST["index"];
             $time = $_POST["time"];
             $leave_type = $_POST["leave_type"];
-            $model = new VacationForm();
-            $html = "";
-            $entry_time = date("Y/m/d",strtotime(date("Y/m/d")."+2 year"));
-            if($model->retrieveData($leave_type)){
-                if($model->vaca_type == 'E'){
-                    $yearDay =YearDayForm::getSumDayToYear($index,$time);
-                    $leaveNum =LeaveForm::getLeaveNumToYear($index,$time);
-                    $entry_time =LeaveForm::getMaxYearLeaveDate($index,$time);
-                    $leaveNum =$yearDay - floatval($leaveNum);
-                    $html = "<p class='form-control-static text-success'>".Yii::t("contract","remaining days of annual leave")."：".$leaveNum."</p>";
-                }
+            $model = new VacationDayForm($index,$leave_type,$time);
+            $useDay = $model->getVacationSum();
+            if($model->remain_bool){
+                $entry_time = $model->getEndTime();
+                $html = "<p class='form-control-static text-success'>".Yii::t("contract","remaining days")."：".$useDay."</p>";
+            }else{
+                $entry_time = date("Y/m/d",strtotime(date("Y/m/d")."+2 year"));
+                $html = "";
             }
             echo CJSON::encode(array("status"=>1,"html"=>$html,"entry_time"=>$entry_time));
         }else{

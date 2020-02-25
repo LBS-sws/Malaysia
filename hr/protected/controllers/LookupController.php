@@ -26,8 +26,8 @@ class LookupController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('company','supplier','staff','product','companyex','supplierex','staffex','productex','template',
-						'account','accountex'
+				'actions'=>array('company','supplier','staff','cityex','staffEmailEx','staffAllex','product','companyex','supplierex','staffex','productex','template',
+						'account','accountex','applytemplate'
 					),
 				'users'=>array('@'),
 			),
@@ -156,6 +156,66 @@ class LookupController extends Controller
 		print json_encode($result);
 	}
 
+	public function actionCityEx($search)
+	{
+		$suffix = Yii::app()->params['envSuffix'];
+        $result = array();
+        $searchx = str_replace("'","\'",$search);
+        $records = Yii::app()->db->createCommand()->select("a.code,a.name")
+            ->from("security$suffix.sec_city a")
+            ->leftJoin("security$suffix.sec_user b","a.incharge = b.username")
+            ->where("(b.email !='' or b.email is not null) and a.name like '%$searchx%'")->queryAll();
+		if (count($records) > 0) {
+			foreach ($records as $k=>$record) {
+				$result[] = array(
+						'id'=>$record['code'],
+						'value'=>$record['name'],
+					);
+			}
+		}
+		print json_encode($result);
+	}
+
+	public function actionStaffAllEx($search)
+	{
+//		$suffix = Yii::app()->params['envSuffix'];
+		$suffix = '_w';
+		$city = Yii::app()->user->city();
+        $city_allow = Yii::app()->user->city_allow();
+		$result = array();
+		$searchx = str_replace("'","\'",$search);
+		$sql ="b.name like '%$searchx%' and b.city in ($city_allow)";
+        $records = Yii::app()->db->createCommand()->select("b.*")->from("hr_employee b")
+            ->where("b.name like '%$searchx%' and b.city in ($city_allow) and b.staff_status = 0")->queryAll();
+		if (count($records) > 0) {
+			foreach ($records as $k=>$record) {
+				$result[] = array(
+						'id'=>$record['id'],
+						'value'=>$record['name'],
+					);
+			}
+		}
+		print json_encode($result);
+	}
+
+	public function actionStaffEmailEx($search)
+	{
+        //$city_allow = Yii::app()->user->city_allow();
+		$searchx = str_replace("'","\'",$search);
+        $suffix = Yii::app()->params['envSuffix'];
+        $records = Yii::app()->db->createCommand()->select("username as id,disp_name as value")->from("security$suffix.sec_user")
+            ->where("disp_name like '%$searchx%' and status = 'A'")->queryAll();
+        if (count($records) > 0) {
+            foreach ($records as $k=>$record) {
+                $result[] = array(
+                    'id'=>$record['id'],
+                    'value'=>$record['value'],
+                );
+            }
+        }
+        print json_encode($result);
+	}
+
 	public function actionProduct($search)
 	{
 		$city = '99999';	//Yii::app()->user->city();
@@ -219,23 +279,40 @@ class LookupController extends Controller
 		print json_encode($result);
 	}
 
-	public function actionTemplate($system) {
+	public function actionTemplate() {
+        $city = Yii::app()->user->city();
 		$result = array();
-		$suffix = Yii::app()->params['envSuffix'];
-		$sql = "select temp_id, temp_name from security$suffix.sec_template
-				where system_id='$system'
+		$sql = "select id, tem_name from hr_template
+				where city='$city'
 			";
 		$records = Yii::app()->db->createCommand($sql)->queryAll();
 		if (count($records) > 0) {
 			foreach ($records as $k=>$record) {
 				$result[] = array(
-						'id'=>$record['temp_id'],
-						'name'=>$record['temp_name'],
+						'id'=>$record['id'],
+						'name'=>$record['tem_name'],
 					);
 			}
 		}
 		print json_encode($result);
 	}
+
+    public function actionApplytemplate($id) {
+	    if(!is_numeric($id)||empty($id)){
+            print json_encode(array());
+        }else{
+            $city = Yii::app()->user->city();
+            $sql = "select tem_str from hr_template
+				where city='$city' AND id='$id'
+			";
+            $records = Yii::app()->db->createCommand($sql)->queryRow();
+            $lists = array();
+            if ($records) {
+                $lists = explode(",",$records["tem_str"]);
+            }
+            print json_encode($lists);
+        }
+    }
 
 //	public function actionSystemDate()
 //	{

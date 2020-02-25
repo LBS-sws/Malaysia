@@ -17,6 +17,10 @@ class DeptForm extends CFormModel
 	public $dept_class;
 	public $manager=0;
 	public $technician=0;
+	public $review_status=0;
+	public $review_type=1;
+	public $sales_type=0;
+	public $review_leave=0;
 	/**
 	 * Declares customized attribute labels.
 	 * If not declared here, an attribute would have a label that is
@@ -33,6 +37,10 @@ class DeptForm extends CFormModel
             'dept_class'=>Yii::t('contract','Job category'),
             'manager'=>Yii::t('fete','Manager level audit'),
             'technician'=>Yii::t('fete','technician'),
+            'review_status'=>Yii::t('contract','dept review'),
+            'review_type'=>Yii::t('contract','review type'),
+            'review_leave'=>Yii::t('contract','review leave'),
+            'sales_type'=>Yii::t('contract','sales type'),
 		);
 	}
 
@@ -43,8 +51,10 @@ class DeptForm extends CFormModel
 	{
 		return array(
 			//array('id, position, leave_reason, remarks, email, staff_type, leader','safe'),
-            array('id, name, z_index, dept_id, type, dept_class, manager, technician','safe'),
+            array('id, name, sales_type, z_index, dept_id, type, dept_class, manager, technician, review_status, review_type, review_leave','safe'),
 			array('name','required'),
+			array('review_leave','required'),
+			array('review_type','required'),
 			array('city','validateCity'),
             array('dept_id','validateDeptId'),
 			array('name','validateName'),
@@ -156,6 +166,66 @@ class DeptForm extends CFormModel
         return $arr;
     }
 
+    public function getReviewType($str=""){
+	    $arr = array(
+	        1=>Yii::t("fete","normal"),
+	        2=>Yii::t("fete","technician"),
+	        3=>Yii::t("staff","Sales"),
+	        4=>Yii::t("fete","charge"),
+        );
+	    if(key_exists($str,$arr)){
+            return $arr[$str];
+        }
+        return $arr;
+    }
+
+    public function getGroupType($str="",$bool=false){
+	    $arr = array(
+	        0=>Yii::t("fete","none"),//無
+	        1=>Yii::t("contract","group business"),//商業組
+	        2=>Yii::t("contract","group repast"),//餐飲組
+        );
+	    if($bool){
+            if(key_exists($str,$arr)){
+                return $arr[$str];
+            }else{
+                return $str;
+            }
+        }
+        return $arr;
+    }
+
+    public function getReviewLeave($str="",$bool=false){
+	    $arr = array(
+	        Yii::t("fete","none"),
+	        Yii::t("app","Region"),
+	        Yii::t("misc","All")
+        );
+	    if($bool){
+	        if(key_exists($str,$arr)){
+                return $arr[$str];
+            }else{
+                return $str;
+            }
+        }
+        return $arr;
+    }
+
+    public function getSalesType($str="",$bool=false){
+        $arr = array(
+            Yii::t("misc","No"),
+            Yii::t("misc","Yes")
+        );
+        if($bool){
+            if(key_exists($str,$arr)){
+                return $arr[$str];
+            }else{
+                return $str;
+            }
+        }
+        return $arr;
+    }
+
     //獲取職位列表
 	public function getDeptListToCity($dept_id,$city=''){
 	    $sql = "";
@@ -174,6 +244,16 @@ class DeptForm extends CFormModel
             }
         }
         return $arr;
+    }
+
+    //是否是銷售部門  0：不是  1：是銷售部
+	public function getSalesTypeToId($dept_id){
+        $rows = Yii::app()->db->createCommand()->select()->from("hr_dept")
+            ->where("id=:id",array(":id"=>$dept_id))->queryRow();
+        if ($rows){
+            return $rows["sales_type"];
+        }
+        return 0;
     }
 
     //獲取崗位列表
@@ -245,10 +325,14 @@ class DeptForm extends CFormModel
 				$this->z_index = $row['z_index'];
 				$this->city = $row['city'];
                 $this->type = $row['type'];
+                $this->sales_type = $row['sales_type'];
                 $this->dept_id = $row['dept_id'];
                 $this->dept_class = $row['dept_class'];
                 $this->manager = $row['manager'];
                 $this->technician = $row['technician'];
+                $this->review_type = $row['review_type'];
+                $this->review_status = $row['review_status'];
+                $this->review_leave = $row['review_leave'];
 				break;
 			}
 		}
@@ -281,9 +365,9 @@ class DeptForm extends CFormModel
 				break;
 			case 'new':
 				$sql = "insert into hr_dept(
-							name, type, z_index, dept_id, city, dept_class, manager, technician, lcu
+							name, type, sales_type, z_index, dept_id, city, dept_class, manager, technician, review_status, review_type, review_leave, lcu
 						) values (
-							:name, :type, :z_index, :dept_id, :city, :dept_class, :manager, :technician, :lcu
+							:name, :type, :sales_type, :z_index, :dept_id, :city, :dept_class, :manager, :technician, :review_status, :review_type, :review_leave, :lcu
 						)";
 				break;
 			case 'edit':
@@ -296,6 +380,10 @@ class DeptForm extends CFormModel
 							dept_class = :dept_class,
 							manager = :manager,
 							technician = :technician,
+							review_status = :review_status,
+							review_type = :review_type,
+							review_leave = :review_leave,
+							sales_type = :sales_type,
 							luu = :luu 
 						where id = :id
 						";
@@ -313,12 +401,20 @@ class DeptForm extends CFormModel
 			$command->bindParam(':z_index',$this->z_index,PDO::PARAM_INT);
 		if (strpos($sql,':type')!==false)
 			$command->bindParam(':type',$this->type,PDO::PARAM_INT);
+		if (strpos($sql,':sales_type')!==false)
+			$command->bindParam(':sales_type',$this->sales_type,PDO::PARAM_INT);
 		if (strpos($sql,':dept_class')!==false)
 			$command->bindParam(':dept_class',$this->dept_class,PDO::PARAM_STR);
 		if (strpos($sql,':manager')!==false)
 			$command->bindParam(':manager',$this->manager,PDO::PARAM_STR);
 		if (strpos($sql,':technician')!==false)
 			$command->bindParam(':technician',$this->technician,PDO::PARAM_STR);
+		if (strpos($sql,':review_status')!==false)
+			$command->bindParam(':review_status',$this->review_status,PDO::PARAM_STR);
+		if (strpos($sql,':review_type')!==false)
+			$command->bindParam(':review_type',$this->review_type,PDO::PARAM_STR);
+		if (strpos($sql,':review_leave')!==false)
+			$command->bindParam(':review_leave',$this->review_leave,PDO::PARAM_STR);
 
         if (strpos($sql,':city')!==false)
             $command->bindParam(':city',$this->city,PDO::PARAM_STR);

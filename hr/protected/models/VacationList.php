@@ -13,6 +13,8 @@ class VacationList extends CListPageModel
 			'name'=>Yii::t('fete','Vacation Name'),
 			'city'=>Yii::t('contract','City'),
             'only'=>Yii::t('fete','Scope of application'),
+            'ass_id_name'=>Yii::t('contract','associated config'),
+            'ass_bool'=>Yii::t('contract','associated bool'),
 		);
 	}
 
@@ -58,6 +60,8 @@ class VacationList extends CListPageModel
 				$this->attr[] = array(
 					'id'=>$record['id'],
 					'name'=>$record['name'],
+					'ass_id_name'=>$record['ass_id_name'],
+					'ass_bool'=>$record['ass_bool']==1?Yii::t("misc","Yes"):Yii::t("misc","No"),
 					'only'=>Yii::t("fete",$record['only']),
                     'city'=>CGeneral::getCityName($record["city"]),
 				);

@@ -12,7 +12,8 @@ class BindingList extends CListPageModel
 		return array(	
 			'id'=>Yii::t('contract','ID'),
 			'employee_name'=>Yii::t('contract','Employee Name'),
-			'city'=>Yii::t('contract','City'),
+			'employee_city'=>Yii::t('contract','Employee City'),
+			'user_city'=>Yii::t('contract','User City'),
 			'user_name'=>Yii::t('contract','Account number'),
             'city_name'=>Yii::t('contract','City'),
 		);
@@ -23,12 +24,14 @@ class BindingList extends CListPageModel
 		$suffix = Yii::app()->params['envSuffix'];
 		$city = Yii::app()->user->city();
         $city_allow = Yii::app()->user->city_allow();
-		$sql1 = "select a.id,a.user_name,b.name,b.city from hr_binding a 
+		$sql1 = "select a.id,b.name,b.city as employee_city,d.city as user_city,d.disp_name from hr_binding a 
                 LEFT JOIN hr_employee b ON a.employee_id = b.id
+                LEFT JOIN security$suffix.sec_user d ON d.username = a.user_id
                 where b.city IN ($city_allow) 
 			";
         $sql2 = "select count(a.id) from hr_binding a 
                 LEFT JOIN hr_employee b ON a.employee_id = b.id
+                LEFT JOIN security$suffix.sec_user d ON d.username = a.user_id
                 where b.city IN ($city_allow) 
 			";
 		$clause = "";
@@ -38,11 +41,14 @@ class BindingList extends CListPageModel
 				case 'employee_name':
 					$clause .= General::getSqlConditionClause('b.name',$svalue);
 					break;
-                case 'city_name':
+                case 'employee_city':
                     $clause .= ' and b.city in '.WordForm::getCityCodeSqlLikeName($svalue);
                     break;
+                case 'user_city':
+                    $clause .= ' and d.city in '.WordForm::getCityCodeSqlLikeName($svalue);
+                    break;
 				case 'user_name':
-					$clause .= General::getSqlConditionClause('a.user_name',$svalue);
+					$clause .= General::getSqlConditionClause('d.disp_name',$svalue);
 					break;
 			}
 		}
@@ -68,8 +74,9 @@ class BindingList extends CListPageModel
 				$this->attr[] = array(
 					'id'=>$record['id'],
 					'employee_name'=>$record['name'],
-                    'city'=>CGeneral::getCityName($record["city"]),
-					'user_name'=>$record['user_name'],
+                    'employee_city'=>CGeneral::getCityName($record["employee_city"]),
+					'user_name'=>$record['disp_name'],
+                    'user_city'=>CGeneral::getCityName($record["user_city"]),
 				);
 			}
 		}

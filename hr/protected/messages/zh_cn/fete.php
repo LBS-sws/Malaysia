@@ -161,6 +161,7 @@ return array(
     'charge'=>'地区主管',
     'director'=>'总监',
     'you'=>'你',
+    'normal'=>'常规',
 
     'Regular overtime'=>'常规加班',
 
@@ -169,5 +170,16 @@ return array(
     'Vacation type form'=>"假期种类表单",
     'Vacation type code'=>"假期种类编号",
     'Vacation type name'=>"假期种类名字",
+
+    //2019-11-12
+    'Assessment score score reference:'=>"评核分数得分参考：",
+    'The starting point of each score is 6, with 6 as the central axis'=>"每一项评分的起步点在6分，6为中轴",
+    '0-3: a 0-3 rating is given for even one example of an action that touches or undermines the group\'s philosophy and principles'=>"0-3分：如果有行为触动或破坏了集团的理念和原则的话，哪怕是只有一个例子，也会予以0-3级别",
+    '4 points: there are obvious examples'=>"4分：有出现明显例子",
+    '5 points: give 5 points if you don\'t do well in a project'=>"5分：如果有项目成绩不太好的就给5分",
+    '6 points: the generic example has no obvious example, and there is room for further improvement, can give 6 points'=>"6分：泛例没有明显例子的，而且有更进一步的进步空间，可以给6分",
+    '7 points: 7 points for doing better than expected'=>"7分：如果比想象做的不错出色的给7分",
+    '8-9 points: for the city level managed by a colleague, he/she will be given 8 or 9 points according to the size of the city he/she manages, and 8 or 9 points must be supported by substantial examples in the evaluation period at that time'=>"8-9分：同事在管理的城市水平上，按他所在管理城市的规模有相应高于要求的水平，会给8、 9分，8、9分必须在当时评核时段有实质例子支持",
+    '10 points: if there are more than 3 outstanding examples, you can give 10 points (although this is not easily achieved by colleagues, so it is very rare).'=>"10分：如果出色的例子多于3个，可以给10分（当然这个也不会轻易有同事达到，所以也十分罕有）",
 );
 ?>

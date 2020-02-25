@@ -28,6 +28,12 @@
         echo "<th>";
         echo TbHtml::link($this->getLabelName('dept_class').$this->drawOrderArrow('dept_class'),'#',$this->createOrderLink('dept-list','dept_class'));
         echo "</th>";
+        echo "<th>";
+        echo TbHtml::link($this->getLabelName('review_status').$this->drawOrderArrow('review_status'),'#',$this->createOrderLink('dept-list','review_status'));
+        echo "</th>";
+        echo "<th>";
+        echo TbHtml::link($this->getLabelName('review_type').$this->drawOrderArrow('review_type'),'#',$this->createOrderLink('dept-list','review_type'));
+        echo "</th>";
     }
     ?>
 </tr>

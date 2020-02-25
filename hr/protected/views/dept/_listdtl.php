@@ -21,6 +21,12 @@
         echo "<td>";
         echo DeptForm::getDeptToId($this->record['dept_class']);
         echo "</td>";
+        echo "<td>";
+        echo DeptForm::getDeptToId($this->record['review_status']);
+        echo "</td>";
+        echo "<td>";
+        echo DeptForm::getDeptToId($this->record['review_type']);
+        echo "</td>";
     }
     ?>
 </tr>

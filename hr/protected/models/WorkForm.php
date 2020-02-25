@@ -506,7 +506,7 @@ class WorkForm extends CFormModel
             $assType = $assList[$this->z_index];
             switch ($this->z_index){
                 case 1:
-                    $email->addEmailToPrefixAndPoi($assType,$row["department"]);
+                    $email->addEmailToPrefixAndPoi($assType,$row["department"],$row["group_type"]);
                     break;
                 case 2:
                     $email->addEmailToPrefixAndOnlyCity($assType,$row["city"]);

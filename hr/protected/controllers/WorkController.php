@@ -42,6 +42,10 @@ class WorkController extends Controller
                 'expression'=>array('WorkController','allowWrite'),
             ),
             array('allow',
+                'actions'=>array('back'),
+                'expression'=>array('WorkController','allowBack'),
+            ),
+            array('allow',
                 'actions'=>array('cancel'),
                 'expression'=>array('WorkController','allowCancelled'),
             ),
@@ -49,6 +53,9 @@ class WorkController extends Controller
                 'users'=>array('*'),
             ),
         );
+    }
+    public static function allowBack() {
+        return Yii::app()->user->validFunction('ZR13');
     }
 
     public static function allowReadWrite() {
@@ -189,6 +196,24 @@ class WorkController extends Controller
         }
     }
 
+    //退回
+    public function actionBack($index){
+        $model = new WorkForm();
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            if($model->status == 1){
+                Yii::app()->db->createCommand()->update('hr_employee_work', array(
+                    'status'=>0
+                ), 'id=:id', array(':id'=>$model->id));
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('contract','finish to send back'));
+                $this->redirect(Yii::app()->createUrl('work/edit',array('index'=>$model->id)));
+            }else{
+                Dialog::message(Yii::t('dialog','Information'), "请假单异常，请刷新重试");
+                $this->redirect(Yii::app()->createUrl('work/edit',array('index'=>$model->id)));
+            }
+        }
+    }
 
     //時間運算
     public function actionAddDate(){

@@ -89,6 +89,14 @@ $this->pageTitle=Yii::app()->name . ' - Dept Form';
                         ); ?>
                     </div>
                 </div>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'sales_type',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->dropDownList($model, 'sales_type',DeptForm::getSalesType(),
+                            array('disabled'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
             <?php endif; ?>
 
 			<div class="form-group">
@@ -124,6 +132,32 @@ $this->pageTitle=Yii::app()->name . ' - Dept Form';
                     <?php echo $form->labelEx($model,'technician',array('class'=>"col-sm-2 control-label")); ?>
                     <div class="col-sm-3">
                         <?php echo $form->dropDownList($model, 'technician',EmployList::getTechnicianList(),
+                            array('disabled'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if ($model->type==1): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'review_status',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->dropDownList($model, 'review_status',array(Yii::t("contract","not Participate"),Yii::t("contract","Participate")),
+                            array('disabled'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'review_type',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->dropDownList($model, 'review_type',$model->getReviewType(),
+                            array('disabled'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'review_leave',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->dropDownList($model, 'review_leave',$model->getReviewLeave(),
                             array('disabled'=>($model->scenario=='view'))
                         ); ?>
                     </div>

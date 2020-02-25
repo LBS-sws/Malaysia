@@ -156,8 +156,9 @@ class BindingForm extends CFormModel
 	{
         $city = Yii::app()->user->city();
         $city_allow = Yii::app()->user->city_allow();
-        $rows = Yii::app()->db->createCommand()->select()->from("hr_binding")
-            ->where("id=:id and city in ($city_allow) ", array(':id'=>$index))->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("a.*,b.city as employee_city")->from("hr_binding a")
+            ->leftJoin("hr_employee b","a.employee_id = b.id")
+            ->where("a.id=:id and b.city in ($city_allow) ", array(':id'=>$index))->queryAll();
 		if (count($rows) > 0)
 		{
 			foreach ($rows as $row)
@@ -167,7 +168,7 @@ class BindingForm extends CFormModel
 				$this->user_id = $row['user_id'];
                 $this->employee_id = $row['employee_id'];
                 $this->employee_name = $row['employee_name'];
-                $this->city = $row['city'];
+                $this->city = $row['employee_city'];
 				break;
 			}
 		}

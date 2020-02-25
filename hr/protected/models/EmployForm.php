@@ -73,6 +73,7 @@ class EmployForm extends CFormModel
     public $emergency_user;//紧急联络人姓名
     public $emergency_phone;//紧急联络人手机号
     public $code_old;//員工編號（舊）
+    public $group_type;//組別類型
 
     public $no_of_attm = array(
         'employ'=>0
@@ -151,6 +152,7 @@ class EmployForm extends CFormModel
             'emergency_user'=>Yii::t('contract','Emergency User'),
             'emergency_phone'=>Yii::t('contract','Emergency Phone'),
             'code_old'=>Yii::t('contract','Code Old'),
+            'group_type'=>Yii::t('contract','group type'),
 		);
 	}
 	/**
@@ -161,7 +163,7 @@ class EmployForm extends CFormModel
 	{
 		return array(
 			//array('id, position, leave_reason, remarks, email, staff_type, leader','safe'),
-            array('id, code, name, staff_id, company_id, contract_id, address, address_code, contact_address, contact_address_code, phone, phone2, user_card, department, position, wage,time,
+            array('id, group_type code, name, staff_id, company_id, contract_id, address, address_code, contact_address, contact_address_code, phone, phone2, user_card, department, position, wage,time,
              start_time, end_time, test_type, test_start_time, sex, test_end_time, test_wage, word_status, city, entry_time, age, birth_time, health, ject_remark, staff_status,
               education, experience, english, technology, other, year_day, email, remark, image_user, image_code, image_work, image_other, fix_time, code_old,
                test_length,staff_type,staff_leader,attachment,nation, household, empoyment_code, social_code, user_card_date, emergency_user, emergency_phone',
@@ -396,6 +398,7 @@ class EmployForm extends CFormModel
                 $this->emergency_user = $row['emergency_user'];
                 $this->emergency_phone = $row['emergency_phone'];
                 $this->code_old = $row['code_old'];
+                $this->group_type = $row['group_type'];
 				break;
 			}
 		}
@@ -468,11 +471,11 @@ class EmployForm extends CFormModel
 				break;
 			case 'new':
 				$sql = "insert into hr_employee(
-							name, sex, attachment, staff_id, company_id, contract_id, city, address, contact_address, phone, user_card, department, position, wage, start_time, end_time, test_type, test_end_time, test_start_time,
+							name, sex, attachment, group_type, staff_id, company_id, contract_id, city, address, contact_address, phone, user_card, department, position, wage, start_time, end_time, test_type, test_end_time, test_start_time,
 							 test_wage,phone2,address_code,contact_address_code,entry_time,birth_time,age,health,education,experience,english,technology,other,year_day,fix_time,user_card_date,emergency_user,emergency_phone,code_old,
 							 email,remark,image_user,image_code,image_work,image_other,staff_status,staff_leader,test_length,staff_type,lcu, nation, household, empoyment_code, social_code
 						) values (
-							:name, :sex, :attachment, :staff_id, :company_id, :contract_id, :city, :address, :contact_address, :phone, :user_card, :department, :position, :wage, :start_time, :end_time, :test_type, :test_end_time, :test_start_time,
+							:name, :sex, :attachment, :group_type, :staff_id, :company_id, :contract_id, :city, :address, :contact_address, :phone, :user_card, :department, :position, :wage, :start_time, :end_time, :test_type, :test_end_time, :test_start_time,
 							 :test_wage,:phone2,:address_code,:contact_address_code,:entry_time,:birth_time,:age,:health,:education,:experience,:english,:technology,:other,:year_day,:fix_time,:date_user_card,:emergency_user,:emergency_phone,:code_old,
 							 :email,:remark,:image_user,:image_code,:image_work,:image_other,1,:staff_leader,:test_length,:staff_type,:lcu, :nation, :household, :empoyment_code, :social_code
 						)";
@@ -529,6 +532,7 @@ class EmployForm extends CFormModel
 							emergency_user = :emergency_user,
 							emergency_phone = :emergency_phone,
 							code_old = :code_old,
+							group_type = :group_type,
 							luu = :luu 
 						where id = :id
 						";
@@ -575,6 +579,8 @@ class EmployForm extends CFormModel
 			$command->bindParam(':end_time',$this->end_time,PDO::PARAM_STR);
 		if (strpos($sql,':test_type')!==false)
 			$command->bindParam(':test_type',$this->test_type,PDO::PARAM_INT);
+		if (strpos($sql,':group_type')!==false)
+			$command->bindParam(':group_type',$this->group_type,PDO::PARAM_INT);
 		if (strpos($sql,':test_end_time')!==false)
 			$command->bindParam(':test_end_time',$this->test_end_time,PDO::PARAM_STR);
 		if (strpos($sql,':test_start_time')!==false)

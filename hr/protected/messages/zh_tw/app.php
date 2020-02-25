@@ -146,6 +146,20 @@ return array(
     'Search all review'=>'查詢所有考核',
 
     'Vacation Type Config'=>'假期種類配置',
+    'Review Template Employee'=>'員工綁定考核模板',
+    'Optimize assessment report'=>'優化人才評核報表',
+    'Daily incoming and outgoing email'=>'入職、離職總覽電郵',
+    'Email Hint'=>'電郵提醒',
+
+    'technical support'=>'中央技術支援',
+    'Apply technical support'=>'申請中央技術支援',
+    'Audit technical support'=>'審核中央技術支援',
+    'Search technical support'=>'查詢中央技術支援',
+    'Search all support'=>'查詢所有支援',
+    'Search support employee'=>'員工支援概況',
+    'Back to review'=>'退回單個考核',
+    'Back to leave and work'=>'退回請假單及加班單',
+
 //沈超添加結束
 );
 ?>

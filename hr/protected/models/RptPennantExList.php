@@ -2,7 +2,6 @@
 class RptPennantExList extends CReport {
 	protected function fields() {
 		return array(
-			'month'=>array('label'=>Yii::t('fete','Month'),'width'=>15,'align'=>'L'),
 			'city'=>array('label'=>Yii::t('contract','City'),'width'=>20,'align'=>'L'),
 			'level'=>array('label'=>Yii::t('fete','level'),'width'=>15,'align'=>'L'),
 			'prize_num'=>array('label'=>Yii::t('fete','prize num'),'width'=>25,'align'=>'C'),
@@ -13,21 +12,23 @@ class RptPennantExList extends CReport {
 			'prize_pro'=>array('label'=>Yii::t('fete','prize pro'),'width'=>25,'align'=>'L'),
 			'prize_type'=>array('label'=>Yii::t('fete','prize')."/".Yii::t('fete','testimonial'),'width'=>30,'align'=>'L'),
             'type_num'=>array('label'=>Yii::t('fete','type number'),'width'=>25,'align'=>'L'),
+            'lcd'=>array('label'=>Yii::t('queue','Req. Date'),'width'=>15,'align'=>'L'),
+            'lud'=>array('label'=>Yii::t('queue','Comp. Date'),'width'=>15,'align'=>'L'),
 		);
 	}
 	
 	public function genReport() {
 		$this->retrieveData();
 		$this->title = $this->getReportName();
-		$this->subtitle = Yii::t('report','Year').':'.$this->criteria['YEAR'].' - '.$this->criteria['MONTH'].' / '
+		$this->subtitle = Yii::t('report','Year').':'.$this->criteria['START_DT'].' ~ '.$this->criteria['END_DT'].' / '
 			.Yii::t('report','Staffs').':'.$this->criteria['STAFFSDESC']
 			;
 		return $this->exportExcel();
 	}
 
 	public function retrieveData() {
-		$year = $this->criteria['YEAR'];
-		$month = intval($this->criteria['MONTH']);
+        $start_dt = date("Y/m/d",strtotime($this->criteria['START_DT']));
+        $end_dt = $this->criteria['END_DT'];
 		$city = $this->criteria['CITY'];
 		$staff_id = $this->criteria['STAFFS'];
 		
@@ -36,9 +37,6 @@ class RptPennantExList extends CReport {
 		$citylist = empty($citylist) ? "'$city'" : "$citylist,'$city'";
 		
 		$suffix = Yii::app()->params['envSuffix'];
-		$mPrice = $month<10?"0":"";
-        $start_dt = $year."-$mPrice".$month."-01 00:00:00";
-        $end_dt = $year."-$mPrice".$month."-31 59:59:59";
 		$cond_staff = '';
 		if (!empty($staff_id)) {
 			$ids = explode('~',$staff_id);
@@ -51,10 +49,14 @@ class RptPennantExList extends CReport {
                 $cond_staff = " and a.employee_id in ($cond_staff)";
             } 
 		}
+		if(!empty($end_dt)){
+            $end_dt = date("Y/m/d",strtotime($end_dt));
+            $cond_staff.=" and date_format(a.lud,'%Y/%m/%d') <= '$end_dt' ";
+        }
         $sql = "select a.*,b.name AS employee_name,b.entry_time,b.position,b.city AS s_city 
                 from hr_prize a 
                 LEFT JOIN hr_employee b ON a.employee_id = b.id
-                where b.city in($citylist) and a.status=3 and a.lcd >= '$start_dt' and a.lcd <= '$end_dt' AND a.id is NOT NULL 
+                where b.city in($citylist) and a.status=3 and date_format(a.lud,'%Y/%m/%d') >= '$start_dt' AND a.id is NOT NULL 
                 $cond_staff
 				order by b.city desc, a.lcd
 			";
@@ -64,7 +66,6 @@ class RptPennantExList extends CReport {
 		    $prizeTypeList = array(Yii::t('fete','testimonial'),Yii::t('fete','prize'));
 			foreach ($rows as $row) {
 				$temp = array();
-				$temp['month'] = $month."月";
 				$temp['city'] = CGeneral::getCityName($row['s_city']);
 				$temp['level'] = CityList::getLevelToCity($row['s_city']);
 				$temp['prize_num'] = $row['prize_num'];
@@ -75,6 +76,8 @@ class RptPennantExList extends CReport {
                 $temp['prize_pro'] = $prizeList[$row['prize_pro']];
                 $temp['prize_type'] = $prizeTypeList[$row['prize_type']];
                 $temp['type_num'] = $row['type_num'];
+                $temp['lcd'] = date("Y/m/d",strtotime($row['lcd']));
+                $temp['lud'] = date("Y/m/d",strtotime($row['lud']));
 				$this->data[] = $temp;
 			}
 		}

@@ -73,6 +73,7 @@ class EmployeeForm extends CFormModel
     public $emergency_user;//紧急联络人姓名
     public $emergency_phone;//紧急联络人手机号
     public $code_old;//員工編號（舊）
+    public $group_type;//組別類型
     public $no_of_attm = array(
         'employ'=>0
     );
@@ -149,6 +150,7 @@ class EmployeeForm extends CFormModel
             'emergency_user'=>Yii::t('contract','Emergency User'),
             'emergency_phone'=>Yii::t('contract','Emergency Phone'),
             'code_old'=>Yii::t('contract','Code Old'),
+            'group_type'=>Yii::t('contract','group type'),
 		);
 	}
 
@@ -159,7 +161,7 @@ class EmployeeForm extends CFormModel
 	{
 		return array(
 			//array('id, position, leave_reason, remarks, email, staff_type, leader','safe'),
-            array('id, code, name, staff_id, company_id, contract_id, address, address_code, contact_address, contact_address_code, phone, phone2, user_card, department, position, wage,time,
+            array('id, group_type, code, name, staff_id, company_id, contract_id, address, address_code, contact_address, contact_address_code, phone, phone2, user_card, department, position, wage,time,
              start_time, end_time, test_type, test_start_time, sex, test_end_time, test_wage, word_status, city, entry_time, age, birth_time, health,staff_status,
              ld_card, sb_card, jj_card, attachment,nation, household, empoyment_code, social_code, fix_time,
               education, experience, english, technology, other, year_day, email, remark, price1, price2, price3, image_user, image_code, image_work, image_other',
@@ -537,6 +539,7 @@ class EmployeeForm extends CFormModel
                 $this->emergency_user = $row['emergency_user'];
                 $this->emergency_phone = $row['emergency_phone'];
                 $this->code_old = $row['code_old'];
+                $this->group_type = $row['group_type'];
 				break;
 			}
 		}
@@ -567,10 +570,10 @@ class EmployeeForm extends CFormModel
 				break;
 			case 'new':
 				$sql = "insert into hr_employee(
-							name, code, sex, staff_id, company_id, contract_id, city, address, contact_address, phone, user_card, department, position, wage, start_time, end_time, test_type, test_end_time, test_start_time, test_wage,
+							name, group_type, code, sex, staff_id, company_id, contract_id, city, address, contact_address, phone, user_card, department, position, wage, start_time, end_time, test_type, test_end_time, test_start_time, test_wage,
 							 lcu, lcd, nation, household, empoyment_code, social_code, fix_time
 						) values (
-							:name, :code, :sex, :staff_id, :company_id, :contract_id, :city, :address, :contact_address, :phone, :user_card, :department, :position, :wage, :start_time, :end_time, :test_type, :test_end_time, :test_start_time, :test_wage,
+							:name, :group_type, :code, :sex, :staff_id, :company_id, :contract_id, :city, :address, :contact_address, :phone, :user_card, :department, :position, :wage, :start_time, :end_time, :test_type, :test_end_time, :test_start_time, :test_wage,
 							 :lcu, :lcd, :nation, :household, :empoyment_code, :social_code, :fix_time
 						)";
 				break;
@@ -647,6 +650,8 @@ class EmployeeForm extends CFormModel
 			$command->bindParam(':end_time',$this->end_time,PDO::PARAM_STR);
 		if (strpos($sql,':test_type')!==false)
 			$command->bindParam(':test_type',$this->test_type,PDO::PARAM_INT);
+		if (strpos($sql,':group_type')!==false)
+			$command->bindParam(':group_type',$this->group_type,PDO::PARAM_INT);
 		if (strpos($sql,':test_end_time')!==false)
 			$command->bindParam(':test_end_time',$this->test_end_time,PDO::PARAM_STR);
 		if (strpos($sql,':test_start_time')!==false)

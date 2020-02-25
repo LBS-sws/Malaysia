@@ -145,6 +145,63 @@ return array(
             ),
 		),
 	),
+    'review'=>array(
+        'access'=>'RE',
+        'icon'=>'fa-life-ring',
+        'items'=>array(
+            'Review Allot'=>array( //分配員工
+                'access'=>'RE01',
+                'url'=>'/ReviewAllot/index',
+            ),
+            'Review Handle'=>array( //優化人才評估
+                'access'=>'RE02',
+                'url'=>'/ReviewHandle/index',
+            ),
+            'Review Search'=>array( //查詢
+                'access'=>'RE03',
+                'url'=>'/ReviewSearch/index',
+            ),
+            'Review Set'=>array( //評估選項設置
+                'access'=>'RE04',
+                'url'=>'/ReviewSet/index',
+            ),
+            'Review Template'=>array( //分配模板
+                'access'=>'RE05',
+                'url'=>'/Template/index',
+            ),
+            'Review Template Employee'=>array( //員工綁定考核模板
+                'access'=>'RE06',
+                'url'=>'/TemplateEmployee/index',
+            ),
+            'Email Hint'=>array( //郵件提醒
+                'access'=>'RE07',
+                'url'=>'/Email/index',
+            ),
+        ),
+    ),
+    //中央技术支持
+    'technical support'=>array(
+        'access'=>'AY',
+        'icon'=>'fa-grav',
+        'items'=>array(
+            'Apply technical support'=>array( //申请中央技术支持
+                'access'=>'AY01',
+                'url'=>'/SupportApply/index',
+            ),
+            'Audit technical support'=>array( //審核中央技术支持
+                'access'=>'AY02',
+                'url'=>'/SupportAudit/index',
+            ),
+            'Search technical support'=>array( //查詢中央技术支持
+                'access'=>'AY03',
+                'url'=>'/SupportSearch/index',
+            ),
+            'Search support employee'=>array( //員工支援概況
+                'access'=>'AY04',
+                'url'=>'/SupportEmployee/index',
+            ),
+        ),
+    ),
 	'System Setting'=>array(
 		'access'=>'ZC',
 		'icon'=>'fa-gear',
@@ -224,6 +281,10 @@ return array(
 			'Pennants cumulative List'=>array(
 				'access'=>'YB06',
                 'url'=>'/report/pennantculist',
+			),
+			'Optimize assessment report'=>array(
+				'access'=>'YB07',
+                'url'=>'/report/reviewlist',
 			),
 			'Report Manager'=>array(
 				'access'=>'YB01',

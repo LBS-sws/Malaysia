@@ -70,6 +70,7 @@ class AuditForm extends CFormModel
     public $emergency_user;//紧急联络人姓名
     public $emergency_phone;//紧急联络人手机号
     public $code_old;//員工編號（舊）
+    public $group_type;//員工編號（舊）
     public $no_of_attm = array(
         'employ'=>0
     );
@@ -144,6 +145,7 @@ class AuditForm extends CFormModel
             'emergency_user'=>Yii::t('contract','Emergency User'),
             'emergency_phone'=>Yii::t('contract','Emergency Phone'),
             'code_old'=>Yii::t('contract','Code Old'),
+            'group_type'=>Yii::t('contract','group type'),
 		);
 	}
 
@@ -155,7 +157,7 @@ class AuditForm extends CFormModel
 	{
 		return array(
 			//array('id, position, leave_reason, remarks, email, staff_type, leader','safe'),
-            array('id, code, name, staff_id, company_id, contract_id, address, address_code, contact_address, contact_address_code, phone, phone2, user_card, department, position, wage,time,
+            array('id, group_type, code, name, staff_id, company_id, contract_id, address, address_code, contact_address, contact_address_code, phone, phone2, user_card, department, position, wage,time,
              start_time, end_time, test_type, test_start_time, sex, test_end_time, test_wage, word_status, city, entry_time, age, birth_time, health,ject_remark,staff_status,
               education, experience, english, technology, other, year_day, email, remark, image_user, image_code, image_work, image_other, code_old,
                test_length,staff_type,staff_leader,attachment,nation, household, empoyment_code, social_code, fix_time',
@@ -263,6 +265,7 @@ class AuditForm extends CFormModel
                 $this->emergency_user = $row['emergency_user'];
                 $this->emergency_phone = $row['emergency_phone'];
                 $this->code_old = $row['code_old'];
+                $this->group_type = $row['group_type'];
 				break;
 			}
 		}
@@ -293,7 +296,6 @@ class AuditForm extends CFormModel
 				$sql = "update hr_employee set
 							staff_status = 3,
 							ject_remark = :ject_remark,
-							lud = :lud,
 							luu = :luu 
 						where id = :id
 						";
@@ -301,7 +303,7 @@ class AuditForm extends CFormModel
 			case 'audit':
 				$sql = "update hr_employee set
 							staff_status = 4,
-							lud = :lud,
+							lcd = :lcd,
 							luu = :luu 
 						where id = :id
 						";
@@ -315,8 +317,8 @@ class AuditForm extends CFormModel
 			$command->bindParam(':ject_remark',$this->ject_remark,PDO::PARAM_STR);
 		if (strpos($sql,':luu')!==false)
 			$command->bindParam(':luu',$uid,PDO::PARAM_STR);
-		if (strpos($sql,':lud')!==false)
-			$command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
+		if (strpos($sql,':lcd')!==false)
+			$command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
 
         //die();
 		$command->execute();

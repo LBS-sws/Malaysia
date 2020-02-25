@@ -56,7 +56,7 @@ class FeteForm extends CFormModel
             ->where('name=:name and city=:city and id!=:id',
                 array(':name'=>$this->name,':id'=>$id,':city'=>$city))->queryAll();
         if(count($rows)>0){
-            $message = Yii::t('contract','Reward Name'). Yii::t('contract',' can not repeat');
+            $message = Yii::t('fete','Fete Name'). Yii::t('contract',' can not repeat');
             $this->addError($attribute,$message);
         }
 	}

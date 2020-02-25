@@ -80,6 +80,9 @@ class AssessList extends CListPageModel
 		    //沒有所有評估列表權限只顯示自己錄入的評估
             $sql1.=" and a.lcu = '$uid' ";
             $sql2.=" and a.lcu = '$uid' ";
+        }else{
+            $sql1.=" and b.city IN ($city_allow) ";
+            $sql2.=" and b.city IN ($city_allow) ";
         }
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {

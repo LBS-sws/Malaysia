@@ -75,6 +75,7 @@ class DepartureForm extends CFormModel
     public $emergency_user;//紧急联络人姓名
     public $emergency_phone;//紧急联络人手机号
     public $code_old;//員工編號（舊）
+    public $group_type;//組別類型
     public $no_of_attm = array(
         'employ'=>0
     );

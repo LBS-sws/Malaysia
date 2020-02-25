@@ -137,8 +137,8 @@ class VacationDayForm
         if(empty($lcd)){
             $statusSql = " and status NOT IN (0,3)";
         }else{
-            $lcd = date("Y/m/d",strtotime($lcd));
-            $statusSql = " and status =  4 and date_format(lcd,'%Y/%m/%d')<='$lcd'";
+            $lcd = date("Y/m/d H:i:s",strtotime($lcd));
+            $statusSql = " and status =  4 and date_format(lcd,'%Y/%m/%d %H:%i:%s')<='$lcd'";
         }
         if(!empty($this->vacation_id_list[0])){
             $vacation_id_list = implode(",",$this->vacation_id_list);

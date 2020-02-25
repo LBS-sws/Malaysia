@@ -19,6 +19,8 @@ class DeptList extends CListPageModel
 			'name_1'=>Yii::t('contract','Leader Name'),
 			'dept_id'=>Yii::t('contract','in department'),
 			'dept_class'=>Yii::t('contract','Job category'),
+            'review_status'=>Yii::t('contract','dept review'),
+            'review_type'=>Yii::t('contract','review type'),
 		);
 	}
 	public function getTypeName(){
@@ -91,6 +93,8 @@ class DeptList extends CListPageModel
 					'city'=>WordForm::getCityNameToCode($record['city']),
 					'z_index'=>$record['z_index'],
 					'dept_id'=>$record['dept_id'],
+					'review_status'=>empty($record['review_status'])?Yii::t("contract","not Participate"):Yii::t("contract","Participate"),
+					'review_type'=>DeptForm::getReviewType($record['review_type']),
 					'dept_class'=>Yii::t("staff",$record['dept_class']),
                     'acc'=>$this->getTypeAcc()
 				);
