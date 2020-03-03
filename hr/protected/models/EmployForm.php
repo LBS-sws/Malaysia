@@ -168,29 +168,29 @@ class EmployForm extends CFormModel
               education, experience, english, technology, other, year_day, email, remark, image_user, image_code, image_work, image_other, fix_time, code_old,
                test_length,staff_type,staff_leader,attachment,nation, household, empoyment_code, social_code, user_card_date, emergency_user, emergency_phone',
                 'safe'),
-			array('entry_time','required'),
-			array('name','required'),
-			array('household','required'),
-			array('staff_id','required'),
-			array('sex','required'),
-			array('name','validateName'),
-			array('company_id','required'),
-			array('contract_id','required'),
-			array('address','required'),
-			array('contact_address','required'),
-			array('phone','required'),
-			array('user_card','required'),
-			array('department','required'),
-			array('position','required'),
+			array('entry_time','required','on'=>"audit"),
+			array('name','required','on'=>"audit"),
+			array('household','required','on'=>"audit"),
+			array('staff_id','required','on'=>"audit"),
+			array('sex','required','on'=>"audit"),
+			array('name','validateName','on'=>"audit"),
+			array('company_id','required','on'=>"audit"),
+			array('contract_id','required','on'=>"audit"),
+			array('address','required','on'=>"audit"),
+			array('contact_address','required','on'=>"audit"),
+			array('phone','required','on'=>"audit"),
+			array('user_card','required','on'=>"audit"),
+			array('department','required','on'=>"audit"),
+			array('position','required','on'=>"audit"),
 			array('wage','validateWage','on'=>"audit"),//由於工資有些用戶沒有權限
-			array('time','required'),
-            array('fix_time','required'),
-			array('start_time','required'),
-			array('end_time','validateEndTime'),
-			array('test_type','required'),
-			array('test_type','validateTestType'),
-			array('year_day','required'),
-            array('year_day', 'validateYearDay'),
+			array('time','required','on'=>"audit"),
+            array('fix_time','required','on'=>"audit"),
+			array('start_time','required','on'=>"audit"),
+			array('end_time','validateEndTime','on'=>"audit"),
+			array('test_type','required','on'=>"audit"),
+			array('test_type','validateTestType','on'=>"audit"),
+			array('year_day','required','on'=>"audit"),
+            array('year_day', 'validateYearDay','on'=>"audit"),
             array('files, removeFileId, docMasterId, no_of_attm','safe'),
 		);
 	}
@@ -555,10 +555,20 @@ class EmployForm extends CFormModel
 			$command->bindParam(':name',$this->name,PDO::PARAM_STR);
 		if (strpos($sql,':staff_id')!==false)
 			$command->bindParam(':staff_id',$this->staff_id,PDO::PARAM_INT);
-		if (strpos($sql,':company_id')!==false)
-			$command->bindParam(':company_id',$this->company_id,PDO::PARAM_INT);
-		if (strpos($sql,':contract_id')!==false)
-			$command->bindParam(':contract_id',$this->contract_id,PDO::PARAM_INT);
+		if (strpos($sql,':company_id')!==false){
+            if(empty($this->company_id)){
+                $command->bindValue(':company_id',null);
+            }else{
+                $command->bindParam(':company_id',$this->company_id,PDO::PARAM_INT);
+            }
+        }
+		if (strpos($sql,':contract_id')!==false){
+            if(empty($this->contract_id)){
+                $command->bindValue(':contract_id',null);
+            }else{
+                $command->bindParam(':contract_id',$this->contract_id,PDO::PARAM_INT);
+            }
+        }
 		if (strpos($sql,':address')!==false)
 			$command->bindParam(':address',$this->address,PDO::PARAM_STR);
 		if (strpos($sql,':contact_address')!==false)
@@ -573,8 +583,13 @@ class EmployForm extends CFormModel
 			$command->bindParam(':position',$this->position,PDO::PARAM_STR);
 		if (strpos($sql,':wage')!==false)
 			$command->bindParam(':wage',$this->wage,PDO::PARAM_INT);
-		if (strpos($sql,':start_time')!==false)
-			$command->bindParam(':start_time',$this->start_time,PDO::PARAM_STR);
+		if (strpos($sql,':start_time')!==false){
+		    if(empty($this->start_time)){
+                $command->bindValue(':start_time',null);
+            }else{
+                $command->bindParam(':start_time',$this->start_time,PDO::PARAM_STR);
+            }
+        }
 		if (strpos($sql,':end_time')!==false)
 			$command->bindParam(':end_time',$this->end_time,PDO::PARAM_STR);
 		if (strpos($sql,':test_type')!==false)
