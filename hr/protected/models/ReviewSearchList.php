@@ -77,6 +77,8 @@ class ReviewSearchList extends CListPageModel
         $expr_sql = " and b.status_type in (1,2,3)";
         if(!Yii::app()->user->validFunction('ZR09')){//沒有所有權限
             $expr_sql.=" and (FIND_IN_SET('$this->employee_id',b.id_s_list) or b.employee_id = '$this->employee_id' or b.lcu = '$this->employee_id')";
+        }else{
+            $expr_sql.=" and c.city IN ($city_allow) ";
         }
         if(!empty($this->year)){
             $expr_sql.=" and b.year='".$this->year."'";
@@ -90,7 +92,7 @@ class ReviewSearchList extends CListPageModel
                 LEFT JOIN hr_company d ON c.company_id = d.id
                 LEFT JOIN hr_dept e ON c.position = e.id
                 LEFT JOIN hr_dept f ON c.department = f.id
-                where c.city IN ($city_allow) AND c.staff_status = 0 $expr_sql
+                where c.staff_status = 0 $expr_sql
 			";
 		$sql2 = "select count(*)  
                 from hr_review b 
@@ -98,7 +100,7 @@ class ReviewSearchList extends CListPageModel
                 LEFT JOIN hr_company d ON c.company_id = d.id
                 LEFT JOIN hr_dept e ON c.position = e.id
                 LEFT JOIN hr_dept f ON c.department = f.id
-                where c.city IN ($city_allow) AND c.staff_status = 0 $expr_sql
+                where c.staff_status = 0 $expr_sql
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {

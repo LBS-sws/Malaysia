@@ -58,7 +58,7 @@ class ReviewHandleList extends CListPageModel
                 LEFT JOIN hr_company d ON c.company_id = d.id
                 LEFT JOIN hr_dept e ON c.position = e.id
                 LEFT JOIN hr_dept f ON c.department = f.id
-                where c.city IN ($city_allow) AND c.staff_status = 0 $expr_sql
+                where c.staff_status = 0 $expr_sql
 			";
 		$sql2 = "select count(*) from hr_review_h a 
                 LEFT JOIN hr_review b ON a.review_id = b.id
@@ -66,7 +66,7 @@ class ReviewHandleList extends CListPageModel
                 LEFT JOIN hr_company d ON c.company_id = d.id
                 LEFT JOIN hr_dept e ON c.position = e.id
                 LEFT JOIN hr_dept f ON c.department = f.id
-                where c.city IN ($city_allow) AND c.staff_status = 0 $expr_sql
+                where c.staff_status = 0 $expr_sql
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {
