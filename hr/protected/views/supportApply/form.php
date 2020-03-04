@@ -132,6 +132,16 @@ $this->pageTitle=Yii::app()->name . ' - supportApply';
                     ); ?>
                 </div>
             </div>
+            <?php if ($model->scenario!='new'): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'apply_type',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->dropDownList($model, 'apply_type',SupportApplyList::getApplyTypeList(),
+                            array('readonly'=>($model->getReadonly()))
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'apply_city',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-2">
@@ -211,6 +221,16 @@ $this->pageTitle=Yii::app()->name . ' - supportApply';
                     <div class="col-sm-4">
                         <?php echo $form->textArea($model, 'audit_remark',
                             array('rows'=>3,'readonly'=>($model->getReadonly()))
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif ?>
+            <?php if (!empty($model->early_remark)): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'early_remark',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-4">
+                        <?php echo $form->textArea($model, 'early_remark',
+                            array('rows'=>3,'readonly'=>(true))
                         ); ?>
                     </div>
                 </div>

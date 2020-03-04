@@ -262,8 +262,10 @@ class TimerCommand extends CConsoleCommand {
         $command->reset();
         $endDay = date("Y/m/d");
         $firstDay = date("Y/m/d",strtotime("$endDay - 15 day"));
-        $sql = "status_type=5 and date_format(apply_end_date,'%Y/%m/%d') >'$firstDay' and date_format(apply_end_date,'%Y/%m/%d') <'$endDay'";
-        $rows = $command->select("*")->from("hr_apply_support")->where($sql)->queryAll();
+        $sql = "a.status_type=5 and date_format(a.apply_end_date,'%Y/%m/%d') >'$firstDay' and date_format(a.apply_end_date,'%Y/%m/%d') <'$endDay'";
+        $rows = $command->select("a.*,b.name as employee_name")->from("hr_apply_support a")
+            ->leftJoin("hr_employee b","a.employee_id = b.id")
+            ->where($sql)->queryAll();
         if($rows){
             $description = "<p>請檢查下列中央技術支援是否已經回饋：</p>";
             $arr = $this->getListToSupportList($description,$rows);
@@ -282,8 +284,10 @@ class TimerCommand extends CConsoleCommand {
         $command->reset();
         $endDay = date("Y/m/d");
         $firstDay = date("Y/m/d",strtotime("$endDay - 15 day"));
-        $sql = "status_type=5 and date_format(apply_end_date,'%Y/%m/%d') <='$firstDay'";
-        $rows = $command->select("*")->from("hr_apply_support")->where($sql)->queryAll();
+        $sql = "a.status_type=5 and date_format(a.apply_end_date,'%Y/%m/%d') <='$firstDay'";
+        $rows = $command->select("a.*,b.name as employee_name")->from("hr_apply_support a")
+            ->leftJoin("hr_employee b","a.employee_id = b.id")
+            ->where($sql)->queryAll();
         if($rows){
             $description = "<p>中央技術支援回饋已超過15天提醒：</p>";
             $arr = $this->getListToSupportList($description,$rows);
@@ -302,7 +306,7 @@ class TimerCommand extends CConsoleCommand {
         $arr = array();
         $arr["city_list"] = array();
         $arr["title"] = $description;
-        $arr["table_head"] = "<thead><th>支援编号</th><th>服务类型</th><th>申请城市</th><th>开始时间</th><th>结束时间</th></thead>";
+        $arr["table_head"] = "<thead><th>支援编号</th><th>服务类型</th><th>申请城市</th><th>开始时间</th><th>结束时间</th><th>支援员工</th></thead>";
         foreach ($rows as $row){
             if(!in_array($row["apply_city"],$this->city_list)){
                 $this->city_list[] = $row["apply_city"];
@@ -313,7 +317,7 @@ class TimerCommand extends CConsoleCommand {
                 $arr[$row["apply_city"]]["city_name"]=CGeneral::getCityName($row["apply_city"]);
             }
             $row["service_type"] = $row["service_type"]==1?Yii::t("contract","service support"):Yii::t("contract","service guide");
-            $arr[$row["apply_city"]]["table_body"][]="<tr><td>".$row["support_code"]."</td>"."<td>".$row["service_type"]."</td>"."<td>".$arr[$row["apply_city"]]["city_name"]."</td>"."<td>".$row["apply_date"]."</td>"."<td>".$row["apply_end_date"]."</td></tr>";
+            $arr[$row["apply_city"]]["table_body"][]="<tr><td>".$row["support_code"]."</td>"."<td>".$row["service_type"]."</td>"."<td>".$arr[$row["apply_city"]]["city_name"]."</td>"."<td>".$row["apply_date"]."</td>"."<td>".$row["apply_end_date"]."</td>"."<td>".$row["employee_name"]."</td></tr>";
         }
         return $arr;
     }

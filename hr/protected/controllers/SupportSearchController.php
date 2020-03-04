@@ -25,6 +25,10 @@ class SupportSearchController extends Controller
     {
         return array(
             array('allow',
+                'actions'=>array('early'),
+                'expression'=>array('SupportSearchController','allowReadWrite'),
+            ),
+            array('allow',
                 'actions'=>array('index','view'),
                 'expression'=>array('SupportSearchController','allowReadOnly'),
             ),
@@ -32,6 +36,10 @@ class SupportSearchController extends Controller
                 'users'=>array('*'),
             ),
         );
+    }
+
+    public static function allowReadWrite() {
+        return Yii::app()->user->validRWFunction('AY02');
     }
 
     public static function allowReadOnly() {
@@ -61,6 +69,24 @@ class SupportSearchController extends Controller
             throw new CHttpException(404,'The requested page does not exist.');
         } else {
             $this->render('form',array('model'=>$model,));
+        }
+    }
+
+    public function actionEarly()
+    {
+        if (isset($_POST['SupportSearchForm'])) {
+            $model = new SupportSearchForm("early");
+            $model->attributes = $_POST['SupportSearchForm'];
+            if ($model->validate()) {
+                $model->status_type = 7;
+                $model->saveData('early');
+                Dialog::message(Yii::t('dialog','Information'), "支援单已提前結束");
+                $this->redirect(Yii::app()->createUrl('supportSearch/view',array("index"=>$model->id)));
+            } else {
+                $message = CHtml::errorSummary($model);
+                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                $this->redirect(Yii::app()->createUrl('supportSearch/view',array("index"=>$model->id)));
+            }
         }
     }
 }

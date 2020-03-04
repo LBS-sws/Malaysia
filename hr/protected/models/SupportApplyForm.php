@@ -51,6 +51,8 @@ class SupportApplyForm extends CFormModel
             'privilege'=>Yii::t('contract','privilege'),
             'privilege_user'=>Yii::t('contract','privilege user'),
             'service_type'=>Yii::t('contract','service type'),
+            'early_remark'=>Yii::t('contract','early remark'),
+            'early_date'=>Yii::t('contract','early date'),
         );
 	}
 
@@ -259,6 +261,7 @@ class SupportApplyForm extends CFormModel
             $this->tem_s_ist = json_decode($row['tem_s_ist'],true);
 
             $this->review_sum = $row['review_sum'];
+            $this->early_remark = $row['early_remark'];
 
             $this->service_type = $row['service_type'];
 

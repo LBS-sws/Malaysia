@@ -174,18 +174,12 @@ class MyPDFTwo {
         $this->_PDF->writeHTMLCell(15, 11, 30,130, $html, 0, 1, 0, true, 'C', true);
         $html = "起始日期/时间";
         $this->_PDF->writeHTMLCell(40, 11, 45,115, $html, 0, 1, 0, true, 'C', true);
+        $html = date("Y-m-d",strtotime($arr["start_time"]));
+        $this->_PDF->writeHTMLCell(40, 11, 45,130, $html, 0, 1, 0, true, 'C', true);
         $html = "终止日期/时间";
         $this->_PDF->writeHTMLCell(40, 11, 85,115, $html, 0, 1, 0, true, 'C', true);
-        if(!empty($arr["time_list"])){
-            $time_y=0;
-            foreach ($arr["time_list"] as $time_list){
-                $html = date("Y-m-d",strtotime($time_list["start_time"]))." ".$time_list["start_time_lg"];
-                $this->_PDF->writeHTMLCell(40, 5, 45,130+$time_y, $html, 0, 1, 0, true, 'C', true);
-                $html = date("Y-m-d",strtotime($time_list["end_time"]))." ".$time_list["end_time_lg"];
-                $this->_PDF->writeHTMLCell(40, 5, 85,130+$time_y, $html, 0, 1, 0, true, 'C', true);
-                $time_y+=6;
-            }
-        }
+        $html = date("Y-m-d",strtotime($arr["end_time"]));
+        $this->_PDF->writeHTMLCell(40, 11, 85,130, $html, 0, 1, 0, true, 'C', true);
         $html = "休假天数/时数";
         $this->_PDF->writeHTMLCell(30, 11, 125,115, $html, 0, 1, 0, true, 'C', true);
         $html = $arr["log_time"]." 天";

@@ -34,7 +34,7 @@ class LeaveForm extends CFormModel
 
     public $state;//員工的辦公類型
 
-
+    public $addTime=array();
 
     public $no_of_attm = array(
         'leave'=>0
@@ -82,17 +82,15 @@ class LeaveForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id,leave_code,employee_id,vacation_id,city,status,leave_cause,start_time,end_time,start_time_lg,end_time_lg,log_time,lcd','safe'),
+			array('id,addTime,leave_code,employee_id,vacation_id,city,status,leave_cause,start_time,end_time,start_time_lg,end_time_lg,log_time,lcd','safe'),
             array('employee_id','validateUser','on'=>array("new","edit","audit")),
             array('vacation_id','required','on'=>array("new","edit","audit")),
             array('leave_cause','required','on'=>array("new","edit","audit")),
             array('log_time','required','on'=>array("new","edit","audit")),
-            array('start_time','required','on'=>array("new","edit","audit")),
-            array('end_time','required','on'=>array("new","edit","audit")),
-            array('end_time','validateEndTime','on'=>array("new","edit","audit")),
-            array('vacation_id','validateLeaveType','on'=>array("new","edit","audit")),
+            array('addTime','validateEndTime','on'=>array("new","edit","audit")),
             array('log_time','validateLogTime','on'=>array("new","edit","audit")),
             array('log_time','numerical','allowEmpty'=>true,'integerOnly'=>false,'on'=>array("new","edit","audit")),
+            array('vacation_id','validateLeaveType','on'=>array("new","edit","audit")),
             array('files, removeFileId, docMasterId','safe'),
 		);
 	}
@@ -134,10 +132,13 @@ class LeaveForm extends CFormModel
     public function validateLeaveType($attribute, $params){
         $model = new VacationDayForm($this->employee_id,$this->vacation_id,$this->start_time);
         $leaveNum = $model->getVacationSum();
-        if ($model->getErrorBool()){
+        $row = Yii::app()->db->createCommand()->select("*")->from("hr_vacation")
+            ->where("id=:id",array(":id"=>$this->vacation_id))->queryRow();
+        if ($model->getErrorBool()||!$row){
             $message = Yii::t('fete','Leave Type').Yii::t('contract',' not exist');
             $this->addError($attribute,$message);
         }else{
+            $this->vacation_list = $row;
             $maxDate = $model->getEndTime();
             if($model->remain_bool){
                 if(floatval($this->log_time) > $leaveNum){
@@ -170,34 +171,91 @@ class LeaveForm extends CFormModel
             }
         }
     }
+    //判斷兩個時間段是否有交集
+    private function timeThatReturnBool($list,$forList){
+        $list["start_time"] = date("Y-m-d",strtotime($list["start_time"]));
+        $list["end_time"] = date("Y-m-d",strtotime($list["end_time"]));
+        $forList["start_time"] = date("Y-m-d",strtotime($forList["start_time"]));
+        $forList["end_time"] = date("Y-m-d",strtotime($forList["end_time"]));
+        if($list["start_time"]>$forList["start_time"]&&$list["start_time"]<$forList["end_time"]){
+            return true;
+        }
+        if($list["end_time"]>$forList["start_time"]&&$list["end_time"]<$forList["end_time"]){
+            return true;
+        }
+        if($list["start_time"]<$forList["start_time"]&&$list["end_time"]>$forList["end_time"]){
+            return true;
+        }
+        return false;
+    }
+
     //請假時間段的驗證
     public function validateEndTime($attribute, $params){
-        if(!empty($this->start_time)&&!empty($this->end_time)){
-            if($this->start_time_lg == "AM"){
-                $startTime = date("Y-m-d",strtotime($this->start_time))." 10:00:00";
-            }else{
-                $startTime = date("Y-m-d",strtotime($this->start_time))." 14:00:00";
-            }
-            if($this->end_time_lg == "AM"){
-                $endTime = date("Y-m-d",strtotime($this->end_time))." 10:00:00";
-            }else{
-                $endTime = date("Y-m-d",strtotime($this->end_time))." 14:00:00";
-            }
-            $sql = "select leave_code from hr_employee_leave WHERE ((start_time>'$startTime' AND end_time <'$endTime') OR (start_time<='$startTime' AND end_time >='$startTime') OR (start_time<='$endTime' AND end_time >='$endTime')) ";
-            //var_dump($sql);die();
-            if(Yii::app()->user->validFunction('ZR06')){
-                $sql.=" and employee_id='".$this->employee_id."'";
-            }else{
-                $sql.=" and employee_id='".$this->getEmployeeIdToUser()."'";;
-            }
-            if(!empty($this->id)&&is_numeric($this->id)){
-                $sql.=" and id!=".$this->id;
-            }
-            $connection = Yii::app()->db;
-            $rows = $connection->createCommand($sql)->queryRow();
-            if($rows){
-                $message = Yii::t('fete','A leave order has been issued during this period')."：".$rows["leave_code"];
-                $this->addError($attribute,$message);
+        $this->start_time = '';
+        $this->start_time_lg = '';
+        $this->end_time = '';
+        $this->end_time_lg = '';
+        if(empty($this->addTime)||!is_array($this->addTime)){
+            $message = "申请时间不能为空";
+            $this->addError($attribute,$message);
+            return false;
+        }else{
+            foreach ($this->addTime as $keyOne=> $list){
+                if(!empty($list["start_time"])&&!empty($list["end_time"])){
+                    if($list["start_time"]>$list["end_time"]){
+                        $message = "开始时间不能大于结束时间";
+                        $this->addError($attribute,$message);
+                        return false;
+                    }
+                    foreach ($this->addTime as $keyTwo => $forList){
+                        if($keyOne!=$keyTwo){
+                            if($this->timeThatReturnBool($list,$forList)){
+                                $message = "时间段不能重复";
+                                $this->addError($attribute,$message);
+                                return false;
+                            }
+                        }
+                    }
+                    if(empty($this->start_time)||date("Y-m-d",strtotime($this->start_time))>=date("Y-m-d",strtotime($list["start_time"]))){
+                        $this->start_time = $list["start_time"];
+                        $this->start_time_lg = $list["start_time_lg"];
+                    }
+                    if(empty($this->end_time)||date("Y-m-d",strtotime($this->end_time))<=date("Y-m-d",strtotime($list["end_time"]))){
+                        $this->end_time = $list["end_time"];
+                        $this->end_time_lg = $list["end_time_lg"];
+                    }
+                    if($list["start_time_lg"] == "AM"){
+                        $startTime = date("Y-m-d",strtotime($list["start_time"]))." 10:00:00";
+                    }else{
+                        $startTime = date("Y-m-d",strtotime($list["start_time"]))." 14:00:00";
+                    }
+                    if($list["end_time_lg"] == "AM"){
+                        $endTime = date("Y-m-d",strtotime($list["end_time"]))." 10:00:00";
+                    }else{
+                        $endTime = date("Y-m-d",strtotime($list["end_time"]))." 14:00:00";
+                    }
+                    $sql = "select b.leave_code from hr_employee_leave_info a LEFT JOIN hr_employee_leave b ON a.leave_id = b.id WHERE ((a.start_time>'$startTime' AND a.end_time <'$endTime') OR (a.start_time<='$startTime' AND a.end_time >='$startTime') OR (a.start_time<='$endTime' AND a.end_time >='$endTime')) ";
+                    //var_dump($sql);die();
+                    if(Yii::app()->user->validFunction('ZR06')){
+                        $sql.=" and b.employee_id='".$this->employee_id."'";
+                    }else{
+                        $sql.=" and b.employee_id='".$this->getEmployeeIdToUser()."'";;
+                    }
+                    if(!empty($this->id)&&is_numeric($this->id)){
+                        $sql.=" and b.id!=".$this->id;
+                    }
+                    $connection = Yii::app()->db;
+                    $rows = $connection->createCommand($sql)->queryRow();
+                    if($rows){
+                        $message = Yii::t('fete','A leave order has been issued during this period')."：".$rows["leave_code"];
+                        $this->addError($attribute,$message);
+                        return false;
+                    }
+                }else{
+                    $message = "时间不能为空";
+                    $this->addError($attribute,$message);
+                    return false;
+                }
             }
         }
     }
@@ -214,13 +272,13 @@ class LeaveForm extends CFormModel
 			";
         $records = $connection->createCommand($sql)->queryRow();
         if($records){
+            $this->resetLeaveType($records);
             $records["dept_name"]=DeptForm::getDeptToId($records["department"]);
             $records["posi_name"]=DeptForm::getDeptToId($records["position"]);
             $model = new VacationDayForm($records["employee_id"],$records["vacation_id"],$records["start_time"]);
             $model->getVacationSum($records['lcd']);
             $records["sumDay"]=$model->getSumDay();
             $records["leaveNum"]=$model->getUseDay();
-            $this->resetLeaveType($records);
             return $records;
         }else{
             return false;
@@ -240,6 +298,28 @@ class LeaveForm extends CFormModel
                 $records["vaca_type"] = $key;
                 break;
             }
+        }
+
+        //後續請假表能填寫多個時間段（擴充）
+        $rows = Yii::app()->db->createCommand()->select("*")
+            ->from("hr_employee_leave_info")->where("leave_id=:leave_id",array(":leave_id"=>$records["id"]))->queryAll();
+        $records["time_list"]=array();
+        if($rows){
+            foreach ($rows as $row){
+                $records["time_list"][]=array(
+                    "start_time"=>$row["start_time"],
+                    "start_time_lg"=>$this->getAMPMList($row["start_time_lg"],true),
+                    "end_time"=>$row["end_time"],
+                    "end_time_lg"=>$this->getAMPMList($row["end_time_lg"],true)
+                );
+            }
+        }else{
+            $records["time_list"][]=array(
+                "start_time"=>$records["start_time"],
+                "start_time_lg"=>$this->getAMPMList($records["start_time_lg"],true),
+                "end_time"=>$records["end_time"],
+                "end_time_lg"=>$this->getAMPMList($records["end_time_lg"],true)
+            );
         }
     }
 
@@ -373,6 +453,73 @@ class LeaveForm extends CFormModel
             default:
                 return $str;
         }
+    }
+
+    public function parintLeaveTimeTable($bool){
+	    $list = $this->addTime;
+	    if(empty($list)){
+            $list = Yii::app()->db->createCommand()->select("*")
+                ->from("hr_employee_leave_info")->where("leave_id=:leave_id",array(":leave_id"=>$this->id))->queryAll();
+        }
+        if(empty($list)){
+	        $list[] = array('start_time'=>$this->start_time,'start_time_lg'=>$this->start_time_lg,'end_time'=>$this->end_time,'end_time_lg'=>$this->end_time_lg);
+        }
+        $html = "<table class='table table-bordered table-striped' id='addTimeTable'><thead><tr>";
+        $html.="<th>".Yii::t("contract","Start Time")."</th>";
+        $html.="<th>".Yii::t("contract","End Time")."</th>";
+        if(!$bool){
+            $html.="<th>&nbsp;</th>";
+        }
+        $html.="</tr></thead><tbody  data-num='".count($list)."'>";
+        foreach ($list as $key =>$row){
+            $html.=$this->getTableTrHtml("LeaveForm[addTime][$key]",$row,$bool);
+        }
+        if(!$bool){
+            $html.=$this->getTableTrHtml("#key#",array('start_time'=>'','start_time_lg'=>'','end_time'=>'','end_time_lg'=>'PM'),$bool);
+            $html.="<tfoot><tr><td colspan='2'>&nbsp;</td><td>".TbHtml::button(Yii::t("app","New"),array("class"=>"btn btn-primary","id"=>"addLeaveTime"))."</td></tr></tfoot>";
+        }
+
+	    $html.="</tbody></table>";
+
+	    echo $html;
+    }
+
+    private function getTableTrHtml($keyName,$row,$bool){
+        if(!empty($row["start_time"])){
+            $row["start_time"] = date("Y/m/d",strtotime($row["start_time"]));
+        }
+        if(!empty($row["end_time"])){
+            $row["end_time"] = date("Y/m/d",strtotime($row["end_time"]));
+        }
+        $html='';
+        if($keyName=="#key#"){
+            $html.="<tr style='display: none;' id='leaveTrModel'>";
+        }else{
+            $html.="<tr>";
+        }
+        $html.="<td>";
+
+        $html.='<div class="input-group"><div class="input-group-addon"><i class="fa fa-calendar"></i></div>';
+        $html.=TbHtml::textField($keyName."[start_time]",$row["start_time"],array("readonly"=>$bool,'class'=>"dateTime s_time"));
+        $html.='<div class="input-group-btn" style="width: 100px;">';
+        $html.=TbHtml::dropDownList($keyName."[start_time_lg]",$row["start_time_lg"],LeaveForm::getAMPMList(),array("readonly"=>$bool,'class'=>"s_long"));
+        $html.='</div></div>';
+
+        $html.="</td>";
+        $html.="<td>";
+
+        $html.='<div class="input-group"><div class="input-group-addon"><i class="fa fa-calendar"></i></div>';
+        $html.=TbHtml::textField($keyName."[end_time]",$row["end_time"],array("readonly"=>$bool,'class'=>"dateTime e_time"));
+        $html.='<div class="input-group-btn" style="width: 100px;">';
+        $html.=TbHtml::dropDownList($keyName."[end_time_lg]",$row["end_time_lg"],LeaveForm::getAMPMList(),array("readonly"=>$bool,'class'=>"e_long"));
+        $html.='</div></div>';
+
+        $html.="</td>";
+        if(!$bool){
+            $html.="<td>".TbHtml::button(Yii::t("dialog","Remove"),array("class"=>"btn btn-danger delWages"))."</td>";
+        }
+        $html.="</tr>";
+        return $html;
     }
 
     //刪除驗證
@@ -536,6 +683,16 @@ class LeaveForm extends CFormModel
 
         //發送郵件
         $this->sendEmail();
+
+        foreach ($this->addTime as $list){
+            Yii::app()->db->createCommand()->insert("hr_employee_leave_info", array(
+                "leave_id"=>$this->id,
+                "start_time"=>$list["start_time"],
+                "start_time_lg"=>$list["start_time_lg"],
+                "end_time_lg"=>$list["end_time_lg"],
+                "end_time"=>$list["end_time"]
+            ));
+        }
 		return true;
 	}
 
@@ -594,11 +751,56 @@ class LeaveForm extends CFormModel
 
 
     //獲取上午下午列表
-    public function getAMPMList(){
-        return array(
+    public function getAMPMList($str='',$bool=false){
+        $arr = array(
             "AM"=>Yii::t("fete","AM"),
             "PM"=>Yii::t("fete","PM")
         );
+        if($bool){
+            if(key_exists($str,$arr)){
+                return $arr[$str];
+            }else{
+                return $str;
+            }
+        }else{
+            return $arr;
+        }
+    }
+
+    private function foreachAddTime(){
+        Yii::app()->db->createCommand()->delete("hr_employee_leave_info", "leave_id=:leave_id",array("leave_id"=>$this->id));
+        $day = 0;
+        foreach ($this->addTime as &$list){
+            $startTime = strtotime($list["start_time"]);
+            $weekStart = getdate($startTime);
+            $startPm = $list["start_time_lg"];
+            $endTime = strtotime($list["end_time"]);
+            $weekEnd = getdate($endTime);
+            $endPm = $list["end_time_lg"];
+            $day += ($endTime-$startTime)/(60*60*24);
+            if($startPm != $endPm){
+                if($startPm =="AM"){
+                    $day++;
+                }
+            }else{
+                $day+=0.5;
+            }
+            if($startPm == "AM"){
+                $list["start_time"].=" 9:00:00";
+            }else{
+                $list["start_time"].=" 13:00:00";
+            }
+            if($endPm == "AM"){
+                $list["end_time"].=" 12:00:00";
+            }else{
+                $list["end_time"].=" 18:00:00";
+            }
+            if(in_array($weekStart["wday"],array(0,6))||in_array($weekEnd["wday"],array(0,6))||$day>=6||$weekStart["wday"]>$weekEnd["wday"]){
+                //允許修改時間
+                return false;
+            }
+        }
+        $this->log_time = $day;
     }
 
 	//計算員工的請假費用
@@ -608,35 +810,7 @@ class LeaveForm extends CFormModel
         }else{
             $this->status = 0;
         }
-        $startTime = strtotime($this->start_time);
-        $weekStart = getdate($startTime);
-        $startPm = $this->start_time_lg;
-        $endTime = strtotime($this->end_time);
-        $weekEnd = getdate($endTime);
-        $endPm = $this->end_time_lg;
-        $day = ($endTime-$startTime)/(60*60*24);
-        if($startPm != $endPm){
-            if($startPm =="AM"){
-                $day++;
-            }
-        }else{
-            $day+=0.5;
-        }
-        if(in_array($weekStart["wday"],array(0,6))||in_array($weekEnd["wday"],array(0,6))||$day>=6||$weekStart["wday"]>$weekEnd["wday"]){
-            //允許修改時間
-            $day = $this->log_time;
-        }
-        $this->log_time = $day;
-        if($startPm == "AM"){
-            $this->start_time.=" 9:00:00";
-        }else{
-            $this->start_time.=" 13:00:00";
-        }
-        if($endPm == "AM"){
-            $this->end_time.=" 12:00:00";
-        }else{
-            $this->end_time.=" 18:00:00";
-        }
+        $this->foreachAddTime();
         $employeeList = EmployeeForm::getEmployeeOneToId($this->employee_id);
         $wage = floatval($employeeList["wage"]);
         $vacationList = $this->vacation_list;

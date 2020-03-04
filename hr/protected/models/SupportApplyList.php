@@ -21,6 +21,7 @@ class SupportApplyList extends CListPageModel
             'apply_type'=>Yii::t('queue','Type'),
             'privilege'=>Yii::t('contract','privilege'),
             'privilege_user'=>Yii::t('contract','privilege user'),
+            'dept_name'=>Yii::t('contract','Position'),
 		);
 	}
 
@@ -29,12 +30,14 @@ class SupportApplyList extends CListPageModel
         $suffix = Yii::app()->params['envSuffix'];
         $city = Yii::app()->user->city;
         $city_allow = Yii::app()->user->city_allow();
-		$sql1 = "select a.*,b.name from hr_apply_support a 
+		$sql1 = "select a.*,b.name,e.name as dept_name from hr_apply_support a 
                 LEFT JOIN hr_employee b ON a.employee_id = b.id
+                LEFT JOIN hr_dept e ON b.position = e.id
                 where a.apply_city='$city' 
 			";
 		$sql2 = "select count(*) from hr_apply_support a 
                 LEFT JOIN hr_employee b ON a.employee_id = b.id
+                LEFT JOIN hr_dept e ON b.position = e.id
                 where a.apply_city='$city' 
 			";
 		$clause = "";
@@ -46,6 +49,9 @@ class SupportApplyList extends CListPageModel
 					break;
 				case 'employee_id':
 					$clause .= General::getSqlConditionClause('b.name',$svalue);
+					break;
+				case 'dept_name':
+					$clause .= General::getSqlConditionClause('e.name',$svalue);
 					break;
 			}
 		}
@@ -76,6 +82,7 @@ class SupportApplyList extends CListPageModel
 					'apply_date'=>$record['apply_date'],
 					'apply_end_date'=>$record['apply_end_date'],
 					'name'=>$record['name'],
+					'dept_name'=>$record['dept_name'],
 					'review_sum'=>$record['review_sum'],
 					'service_type'=>$this->getServiceList($record['service_type'],true),
                     'apply_type'=>$this->getApplyTypeList($record['apply_type'],true),

@@ -126,8 +126,9 @@ class SupportAuditForm extends CFormModel
             $sql = " and a.id !=".$this->id;
         }
         $city = empty($this->city)?"ZY":$this->city;
-        $rows = Yii::app()->db->createCommand()->select("id,code,name")->from("hr_employee")
-            ->where("city = '$city'")->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("a.id,a.code,a.name")->from("hr_employee a")
+            ->leftJoin("hr_dept b","a.position = b.id")
+            ->where("a.city = '$city' and b.dept_class = 'Technician' and staff_status = 0")->queryAll();
         if($rows){
             foreach ($rows as $row){
                 $boolList = $this->SupportEmployeeToSates($row['id'],$this->id);
@@ -234,7 +235,7 @@ class SupportAuditForm extends CFormModel
                 $this->update_remark = $row["update_remark"];
                 if($oldApplyDate != $applyDate || $oldApply_end_date != $this->apply_end_date){
                     $this->update_type = 1;
-                    $this->update_remark .= "時間修改：$oldApplyDate - $oldApply_end_date 修改成 $applyDate - ".$this->apply_end_date."
+                    $this->update_remark .= "时间修改：".date("Y/m/d",strtotime($oldApplyDate))." ~ ".date("Y/m/d",strtotime($oldApply_end_date))." 修改成 ".date("Y/m/d",strtotime($applyDate))." ~ ".date("Y/m/d",strtotime($this->apply_end_date))."
 ";
                 }
                 if($row["service_type"]!=$this->service_type){
@@ -354,8 +355,9 @@ class SupportAuditForm extends CFormModel
         }
         $city = empty($this->city)?"ZY":$this->city;
         $arr = array(""=>"");
-        $rows = Yii::app()->db->createCommand()->select("id,code,name")->from("hr_employee")
-            ->where("city = '$city'")->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("a.id,a.code,a.name")->from("hr_employee a")
+            ->leftJoin("hr_dept b","a.position = b.id")
+            ->where("a.city = '$city' and b.dept_class = 'Technician' and staff_status = 0")->queryAll();
         if($rows){
             foreach ($rows as $row){
                 $boolList = $this->SupportEmployeeToSates($row['id'],$this->id);

@@ -41,6 +41,11 @@
 		?>
 	</th>
 	<th>
+		<?php echo TbHtml::link($this->getLabelName('dept_name').$this->drawOrderArrow('e.name'),'#',$this->createOrderLink('supportAudit-list','e.name'))
+			;
+		?>
+	</th>
+	<th>
 		<?php echo TbHtml::link($this->getLabelName('review_sum').$this->drawOrderArrow('a.review_sum'),'#',$this->createOrderLink('supportAudit-list','a.review_sum'))
 			;
 		?>

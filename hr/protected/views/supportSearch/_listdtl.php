@@ -10,6 +10,7 @@
     <td><?php echo $this->record['apply_date']; ?></td>
     <td><?php echo $this->record['apply_end_date']; ?></td>
     <td><?php echo $this->record['name']; ?></td>
+    <td><?php echo $this->record['dept_name']; ?></td>
     <td><?php echo $this->record['review_sum']; ?></td>
     <td><?php echo $this->record['status']; ?></td>
 </tr>

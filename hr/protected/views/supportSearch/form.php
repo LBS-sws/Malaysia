@@ -37,6 +37,15 @@ $this->pageTitle=Yii::app()->name . ' - supportSearch';
 		?>
 	</div>
 	<div class="btn-group pull-right" role="group">
+        <?php if (Yii::app()->user->validRWFunction("AY02")&&$model->apply_type == 2&&in_array($model->status_type,array(5,6,8,11))): ?>
+            <?php echo TbHtml::button('<span class="fa fa-plug"></span> '.Yii::t('contract','early end'), array(
+                    'id'=>'btnEarly','data-url'=>Yii::app()->createUrl('supportSearch/early'),
+                    'data-label1'=>Yii::t('contract','early date'),
+                    'data-label2'=>Yii::t('contract','early remark'),
+                )
+            );
+            ?>
+        <?php endif; ?>
 		<?php echo TbHtml::button('<span class="fa fa-calendar"></span> '.Yii::t('app','History'), array(
             'data-toggle'=>'modal','data-target'=>'#historydialog'));
 		?>
@@ -86,16 +95,14 @@ $this->pageTitle=Yii::app()->name . ' - supportSearch';
                     ); ?>
                 </div>
             </div>
-            <?php if ($model->apply_type==2): ?>
-                <div class="form-group">
-                    <?php echo $form->labelEx($model,'apply_type',array('class'=>"col-sm-2 control-label")); ?>
-                    <div class="col-sm-3">
-                        <?php echo TbHtml::textField('apply_type', Yii::t("contract","renewal"),
-                            array('class'=>'form-control','readonly'=>(true)));
-                        ?>
-                    </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'apply_type',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-3">
+                    <?php echo $form->dropDownList($model, 'apply_type',SupportApplyList::getApplyTypeList(),
+                        array('readonly'=>($model->getReadonly()))
+                    ); ?>
                 </div>
-            <?php endif ?>
+            </div>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'apply_city',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-3">
@@ -177,6 +184,16 @@ $this->pageTitle=Yii::app()->name . ' - supportSearch';
                     ); ?>
                 </div>
             </div>
+            <?php if (!empty($model->early_remark)): ?>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'early_remark',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->textArea($model, 'early_remark',
+                        array('rows'=>3,'readonly'=>(true))
+                    ); ?>
+                </div>
+            </div>
+            <?php endif ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'employee_id',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-3">
@@ -213,12 +230,35 @@ $this->pageTitle=Yii::app()->name . ' - supportSearch';
 
 <?php
 $this->renderPartial('//site/history',array('tableHtml'=>SupportSearchForm::getHistoryHtml($model->id)));
+if(Yii::app()->user->validRWFunction("AY02")&&$model->apply_type == 2&&in_array($model->status_type,array(5,6,8,11))){
+    $this->renderPartial('//site/earlydialog',array('form'=>$form,'model'=>$model));
+}
 
 
 $js = "
+$('#btnEarly,#btnRenewal').on('click',function(){
+    var url = $(this).data('url');
+    var label1 = $(this).data('label1');
+    var label2 = $(this).data('label2');
+    $('#early_head').text($(this).text());
+    $('#early_date_label').text(label1);
+    $('#early_remark_label').text(label2);
+    $('#earlydialog').modal('show');
+    $('#btnEARLYSubmit').data('url',url);
+});
+
+$('#btnEARLYSubmit').on('click',function(){
+    var url = $(this).data('url');
+	jQuery.yii.submitForm(this,url,{});
+	$('#earlydialog').modal('hide');
+});
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 
+$js = Script::genDatePicker(array(
+    'early_date',
+));
+Yii::app()->clientScript->registerScript('datePick',$js,CClientScript::POS_READY);
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
 ?>

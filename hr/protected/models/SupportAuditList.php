@@ -20,6 +20,7 @@ class SupportAuditList extends CListPageModel
             'service_type'=>Yii::t('contract','service type'),
             'apply_type'=>Yii::t('queue','Type'),
             'privilege'=>Yii::t('contract','privilege'),
+            'dept_name'=>Yii::t('contract','Position'),
 		);
 	}
 
@@ -29,13 +30,15 @@ class SupportAuditList extends CListPageModel
         $city = Yii::app()->user->city;
         $city_allow = Yii::app()->user->city_allow();
         $uid = Yii::app()->user->id;
-		$sql1 = "select a.*,b.name,c.name as city_name from hr_apply_support a 
+		$sql1 = "select a.*,b.name,c.name as city_name,e.name as dept_name from hr_apply_support a 
                 LEFT JOIN hr_employee b ON a.employee_id = b.id
+                LEFT JOIN hr_dept e ON b.position = e.id
                 LEFT JOIN security$suffix.sec_city c ON a.apply_city = c.code
                 where a.status_type in (2,3,4,6,9,10) 
 			";
 		$sql2 = "select count(*) from hr_apply_support a 
                 LEFT JOIN hr_employee b ON a.employee_id = b.id
+                LEFT JOIN hr_dept e ON b.position = e.id
                 LEFT JOIN security$suffix.sec_city c ON a.apply_city = c.code
                 where a.status_type in (2,3,4,6,9,10) 
 			";
@@ -52,6 +55,9 @@ class SupportAuditList extends CListPageModel
 				case 'apply_city':
 					$clause .= General::getSqlConditionClause('c.name',$svalue);
 					break;
+                case 'dept_name':
+                    $clause .= General::getSqlConditionClause('e.name',$svalue);
+                    break;
 			}
 		}
 		
@@ -82,6 +88,7 @@ class SupportAuditList extends CListPageModel
 					'apply_date'=>$record['apply_date'],
 					'apply_end_date'=>$record['apply_end_date'],
 					'name'=>$record['name'],
+					'dept_name'=>$record['dept_name'],
 					'review_sum'=>$record['review_sum'],
                     'apply_type'=>$supportApplyList->getApplyTypeList($record['apply_type'],true),
                     'service_type'=>$supportApplyList->getServiceList($record['service_type'],true),
