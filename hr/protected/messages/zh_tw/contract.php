@@ -483,5 +483,10 @@ return array(
     'priority'=>'優先權',
     'finish and custom'=>'已完成，自定義',
     'Reply/end'=>'回復/結束',
+
+    //2020-03-09
+    'Address of consignee'=>'收貨地址',
+    'Phone of consignee'=>'聯繫電話',
+    'Name of consignee'=>'收貨人姓名',
     );
 ?>

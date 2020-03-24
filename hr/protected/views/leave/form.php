@@ -202,52 +202,6 @@ $this->renderPartial('//site/canceldialog');
 Script::genFileUpload($model,$form->id,'LEAVE');
 
 $js = "
-$('#start_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
-var datePickerObj = $('#end_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
-$('#start_time').on('change',function(){
-    if($('#end_time').val()==''){
-        $('#end_time').val($(this).val());
-        $('#end_time').trigger('change');
-    }
-});
-$('#start_time,#end_time,#start_time_lg,#end_time_lg').on('change',function(){
-    $('#log_time').attr('readonly',true);
-    var start_day = $('#start_time').val();
-    var end_day = $('#end_time').val();
-    var start_hour = $('#start_time_lg').val();
-    var end_hour = $('#end_time_lg').val();
-    if(start_day!=''&&end_day!=''){
-        var d1 = new Date(start_day);
-        var week1 = d1.getDay();
-        var d2 = new Date(end_day);
-        var week2 = d2.getDay();
-        d1 = d1.getTime();
-        d2 = d2.getTime();
-        if(d1<=d2){
-            var time = d2-d1;
-            var hours=time/(24*3600*1000); 
-            if(start_hour==end_hour){
-                hours+=0.5;
-            }else{
-                if(start_hour == 'AM'){
-                    hours++;
-                }
-            }
-            if(hours>0){
-                $('#log_time').val(hours);
-                if(week1 === 0 || week1 === 6 || week2 === 0 || week2 === 6 || hours >= 6 || week1 > week2){
-                    $('#log_time').attr('readonly',false);
-                }
-            }else{
-                $('#log_time').val('');
-            }
-        }else{
-            $('#log_time').val('');
-        }
-    }else{
-        $('#log_time').val('');
-    }
-});
 //取消事件
 $('#btnCancelData').on('click',function() {
 	$('#canceldialog').modal('hide');
@@ -258,16 +212,22 @@ $('#btnCancelData').on('click',function() {
 
 var ajaxBool = true;
 //顯示年假剩餘天數
-$('#leave_type,#start_time,#employee_id').on('change',function(){
+$('#leave_type,.s_time,#employee_id').on('change',function(){
     if(ajaxBool){
         ajaxBool = false;
     }else{
         ajaxBool = true;
     }
+    var startTime='';
+    $('.s_time').each(function(){
+        if(startTime == ''||startTime<$(this).val()){
+            startTime = $(this).val();
+        }
+    });
     $.ajax({
         type: 'post',
         url: '".Yii::app()->createUrl('leave/ajaxYearDay')."',
-        data: {'index':$('#employee_id').val(),'time':$('#start_time').val(),'leave_type':$('#leave_type').val()},
+        data: {'index':$('#employee_id').val(),'time':startTime,'leave_type':$('#leave_type').val()},
         dataType: 'json',
         success: function(data){
             ajaxBool = true;

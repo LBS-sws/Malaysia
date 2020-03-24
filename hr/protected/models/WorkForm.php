@@ -621,7 +621,7 @@ class WorkForm extends CFormModel
         $this->retrieveData($index);
         $html = "";
 	    if($work_type==3){
-            $html.="<div class='form-group'><div class='col-sm-8 col-sm-offset-2'><table class='table table-bordered table-striped'><thead><tr>";
+            $html.="<div class='form-group'><div class='col-lg-8 col-lg-offset-2'><table class='table table-bordered table-striped'><thead><tr>";
             $html.="<th>".Yii::t('contract','Start Time')."</th>";
             $html.="<th>".Yii::t('contract','End Time')."</th>";
             $addTimeArr = $this->getAddTimeListToWorkId($index);
@@ -657,11 +657,11 @@ class WorkForm extends CFormModel
             }
             $html.="</tbody></table></div></div>";
         }else{
-            $html.='<div class="form-group"><label class="col-sm-2 control-label" for="">'.Yii::t('contract','Start Time').'<span class="required">*</span></label><div class="col-sm-4">';
+            $html.='<div class="form-group"><label class="col-lg-2 control-label" for="">'.Yii::t('contract','Start Time').'<span class="required">*</span></label><div class="col-lg-4">';
             $html.=$this->getDateTimeInput($modelStr."[start_time]",$this->start_time,$modelStr."[hours]",$this->hours,array("readonly"=>$only,"class"=>"changeDateTime","id"=>"start_time"),array("readonly"=>$only,"class"=>"changeHours","id"=>"hours"));
             $html.='</div></div>';
 
-            $html.='<div class="form-group"><label class="col-sm-2 control-label" for="">'.Yii::t('contract','End Time').'<span class="required">*</span></label><div class="col-sm-4">';
+            $html.='<div class="form-group"><label class="col-lg-2 control-label" for="">'.Yii::t('contract','End Time').'<span class="required">*</span></label><div class="col-lg-4">';
             $html.=$this->getDateTimeInput($modelStr."[end_time]",$this->end_time,$modelStr."[hours_end]",$this->hours_end,array("readonly"=>$only,"class"=>"changeDateTime","id"=>"end_time"),array("readonly"=>$only,"class"=>"changeHours","id"=>"hours_end"));
             $html.='</div></div>';
         }
